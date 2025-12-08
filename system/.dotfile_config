@@ -11,10 +11,6 @@ GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
 GIT_AUTHOR_EMAIL="$USER_EMAIL"
 GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
 
-# Otras configuraciones del proyecto
-PROJECT_NAME="dotfiles"
-PROJECT_URL="https://github.com/rafiki-dev/dotfiles"
-
 # ---
 # Rutas del proyecto
 # ---
