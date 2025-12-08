@@ -1,198 +1,288 @@
-# **AI Instruction Prompt — Implementation of Improvements**
+# **AI Instruction Prompt — Post-Install Automation Enhancements**
 
-You must implement all the improvements listed below with precision, maintaining full consistency, idempotency, and modularity across the dotfiles project.
-Where “shell_config” is mentioned, it refers to: **`system/.shell_config`**.
-All steps must integrate cleanly with the existing project structure.
+These instructions define all improvements that must be implemented in the script **`aditionals-postinstall.sh`**, as well as some additional changes required across the project.
+
+Your task is to **automate all installation steps**, verify results, and update the project consistently, modularly, and without duplicated code.
+
+Follow every requirement exactly.
 
 ---
 
-# **1. Zsh Custom Directory Integration (`ZSH_CUSTOM=$HOME/.zsh_custom`)**
+# **1. Integrate Visual Studio Code Installation (apt Repository Method)**
 
-Because `export ZSH_CUSTOM=$HOME/.zsh_custom` was added to `zsh/.zshrc`, you must implement the following:
+Implement full automation of Visual Studio Code installation using the official Microsoft repository.
 
-### **1.1. Create a symbolic link**
+Your responsibilities:
 
-* Add a symlink in the installation process to link `zsh/.zsh_custom` into the user’s home directory according to the current dotfiles structure.
+### **1.1. Validate the following debconf command**
 
-### **1.2. Unify configuration into `system/.shell_config`**
+```
+echo "code code/add-microsoft-repo boolean true" | sudo debconf-set-selections
+```
 
-Perform the following consolidations:
+If the command fails, detect the error and automatically fall back to **manual repository installation**.
 
-* Add:
+### **1.2. Implement the manual repository installation fallback**
 
-  ```bash
-  export PATH="$PATH:$HOME/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+Use the official method:
+
+#### **Install Microsoft GPG key**
+
+```
+sudo apt-get install wget gpg &&
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg &&
+sudo install -D -o root -g root -m 644 microsoft.gpg /usr/share/keyrings/microsoft.gpg &&
+rm -f microsoft.gpg
+```
+
+#### **Create the repository file**
+
+Create `/etc/apt/sources.list.d/vscode.sources` with:
+
+```
+Types: deb
+URIs: https://packages.microsoft.com/repos/code
+Suites: stable
+Components: main
+Architectures: amd64,arm64,armhf
+Signed-By: /usr/share/keyrings/microsoft.gpg
+```
+
+#### **Update cache and install**
+
+```
+sudo apt install apt-transport-https &&
+sudo apt update &&
+sudo apt install code
+```
+
+### **1.3. Verify installation**
+
+* Confirm the `code` command is available.
+* Output a success or error message.
+
+---
+
+# **2. Install `uv` (Astral) Automatically**
+
+Use the official installation method:
+
+```
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### **2.1. Verify installation**
+
+* Confirm `uv` is available in PATH.
+* Output appropriate success/error messages.
+
+Reference: [https://docs.astral.sh/uv/getting-started/installation/#installation-methods](https://docs.astral.sh/uv/getting-started/installation/#installation-methods)
+
+---
+
+# **3. Install Docker Using the Official Repository (Ubuntu)**
+
+Integrate the full installation method from Docker’s official documentation.
+
+### **3.1. Add Docker GPG key and repository**
+
+Follow these exact steps:
+
+```
+sudo apt update
+sudo apt install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+```
+
+Create `/etc/apt/sources.list.d/docker.sources`:
+
+```
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc
+```
+
+Update and install:
+
+```
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+### **3.2. Verify installation**
+
+* Confirm Docker service is installed.
+* Check service status with:
+
   ```
-* Move all exports currently located in `system/.env` into `system/.shell_config` (avoid duplication).
-* Move all variables/export definitions currently in `zsh/.zsh_custom/env.zsh` into `system/.shell_config`.
-* Once everything is unified, remove:
+  sudo systemctl status docker
+  ```
+* If not running, start it:
 
-  * `system/.env`
-  * `zsh/.zsh_custom/env.zsh`
-    Ensure code consistency after removal.
+  ```
+  sudo systemctl start docker
+  ```
+* Print a clear success/error result.
 
-### **1.3. Plugin availability verification**
-
-For the Zsh plugins loaded through:
-
-* `$SHARE/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh`
-* `$SHARE/share/zsh-autosuggestions/zsh-autosuggestions.zsh`
-
-Add logic that:
-
-1. **Verifies that the plugin files exist** after installation.
-2. **Notifies the user** clearly if installation paths are missing or incorrect.
+Reference: [https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
 
 ---
 
-# **2. fzf Integration**
+# **4. Add System Maintenance Functions (upgrade, autoremove, clean)**
 
-Add fzf shell integration exactly as described below, **but only after verifying that the `fzf` package is installed**.
-
-### **2.1. Installation verification**
-
-* In `install.sh`, add logic that checks whether `fzf` is installed and functional.
-* If not installed, print a clear message.
-
-### **2.2. Add fzf shell integration**
-
-For **bash**:
-
-```bash
-# Set up fzf key bindings and fuzzy completion
-eval "$(fzf --bash)"
-```
-
-For **zsh**:
-
-```zsh
-# Set up fzf key bindings and fuzzy completion
-source <(fzf --zsh)
-```
-
-Insert these lines into the appropriate shell config only after installation is validated.
-
----
-
-# **3. Load Unified Functions File**
-
-Integrate the loading of `system/functions.zsh` into `system/.shell_config`.
-After integration:
-
-* Remove `zsh/.zsh_custom/functions.zsh`, as it is no longer needed.
-
----
-
-# **4. Improve Default-Shell-to-Zsh Logic**
-
-Replace and enhance the current functionality that sets Zsh as the default shell.
-Use the provided example as a reference for:
-
-* idempotency
-* user notifications
-* validation
-* logging
-* fallback flows
-
-**Important:**
-You MUST maintain consistency with the existing project architecture, not simply replace the existing implementation blindly.
-
-Include the improved version of the following logic:
-
-* verifying that Zsh is installed
-* detecting the correct Zsh path
-* ensuring path exists in `/etc/shells`
-* handling fallback scenarios
-* notifying the user when logout/login is required
-
-Use the example as **inspiration**, but adapt the messages, flow, and behavior to preserve coherence with the current install script.
-
----
-
-# **5. Unify All Symlink Creations**
-
-Create a single unified function named:
+Add full support for:
 
 ```
-link_dotfiles()
+sudo apt autoremove -q
+sudo apt full-upgrade -q
+sudo apt autoclean -q
+# sudo apt clean
 ```
 
-This function must handle **all symlink creation tasks**, including the new links:
+Include clear log messages, such as:
 
-1. `editors/.eslintrc.json` → user’s home directory
-2. `editors/vim/.vimrc` → user’s home directory
-3. (Include all previously existing symlinks)
+* “Removing unused apt dependencies…”
+* “Upgrading apt packages…”
+* “Cleaning package cache…”
 
-Ensure consistent logging, idempotency, path resolution, and error handling.
-
----
-
-# **6. Log File Generation: Store Logs in `logs/` Directory**
-
-Modify the logging functionality to:
-
-* save all generated logs inside the `logs/` directory
-* preserve timestamped filenames
-* print messages both to console and log file
-
-Ensure that the directory is created if it does not exist.
+Follow the example provided.
 
 ---
 
-# **7. Additional Post-Install Script**
+# **5. Install Specified Flatpak Packages**
 
-Add the following behavior to `install.sh`:
+Flatpak package list:
 
-* Check whether `scripts/aditionals-postinstall.sh` exists.
+* `md.obsidian.Obsidian`
+* `com.stremio.Stremio`
 
-* If it exists, ask the user:
+Use the following structure:
 
-  **“Do you want to run the additional post-installation steps?”**
+### **5.1. Add repository**
 
-* If the user accepts:
+```
+sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+```
 
-  * Execute the script
-  * For now, the script only prints a placeholder `echo` (future expansions will be added)
+### **5.2. Install packages system-wide**
 
-* If the user declines:
+```
+flatpak install --system ${FLATPAK_INSTALL_PACKAGES[@]}
+```
 
-  * Continue installation normally
+### **5.3. Update Flatpak apps**
 
----
-
-# **8. Verification Function for Zsh Plugins**
-
-Create a dedicated function that verifies correct installation and functionality of:
-
-1. `zsh-autosuggestions`
-2. `zsh-syntax-highlighting`
-
-### **Requirements:**
-
-* Use **legacy-compatible POSIX commands** (no dependencies).
-* Verification should check:
-
-  * plugin presence
-  * plugin loadability
-  * absence of missing-path errors
-  * correct resolution of the expected file paths
-* Output descriptive success/error messages.
+```
+flatpak update
+```
 
 ---
 
-# **Additional Requirements**
+# **6. Add a Symbolic Link for `system/.inputrc`**
 
-* Whenever “shell_config” is mentioned, it refers to:
-  **`system/.shell_config`**
-* Maintain full consistency with the existing project.
-* Ensure no duplicated definitions remain.
-* Maintain modularity, clarity, and maintainability.
+Modify `install.sh` (inside `link_dotfiles()`) to:
+
+* Create a symlink from `system/.inputrc` to the user’s `$HOME`.
+
+### **6.1. Improve `system/.inputrc` with concise, relevant comments**
+
+Base the comments on this explanation (rewrite them briefly and clearly):
+
+* `.inputrc` configures GNU Readline.
+* User-level config overrides `/etc/inputrc`.
+* Include global config using `$include /etc/inputrc`.
+* Explain (briefly):
+
+  * `set editing-mode vi`
+  * `set colored-stats On`
+  * `set completion-ignore-case On`
+  * `set mark-symlinked-directories On`
+  * `set show-all-if-ambiguous On`
+  * `set show-all-if-unmodified On`
+  * `set visible-stats On`
+
+Comments must be short, direct, and helpful.
+
+---
+
+# **7. Create a New Root-Level `README.md`**
+
+Generate a complete project README including:
+
+### **7.1. Overview**
+
+Explain concisely:
+
+* What the project is
+* What the dotfiles automate
+* Supported system (Ubuntu)
+* Purpose of `install.sh` and `aditionals-postinstall.sh`
+
+### **7.2. Project Structure Summary**
+
+Describe folders:
+
+* `bash/`
+* `zsh/`
+* `system/`
+* `git/`
+* `tmux/`
+* `editors/`
+* etc.
+
+### **7.3. Installation Instructions**
+
+Provide:
+
+* Required commands
+* How to run the installer
+* How modularity works
+* Recommended environment
+
+### **7.4. Links to External References**
+
+List all relevant documentation:
+
+* Visual Studio Code (Linux)
+* UV (Astral)
+* Docker
+* Flatpak
+* Readline / inputrc
+
+---
+
+# **General Requirements**
+
+You must follow all rules below:
+
+### **A. Use only legacy-compatible POSIX commands**
+
+* No non-POSIX shell features
+* No external dependencies unless required by the installer itself
+
+### **B. Output clear success/error messages**
+
+### **C. Maintain project consistency**
+
+* No duplicated configuration
+* Respect modular design
+* Integrate with:
+
+  * `system/.shell_config`
+  * all existing dotfiles structure
+
+### **D. Maintain clean, maintainable, readable code**
 
 ---
 
 # **Useful References**
 
-* [https://github.com/ohmyzsh/ohmyzsh](https://github.com/ohmyzsh/ohmyzsh)
-* [https://github.com/junegunn/fzf](https://github.com/junegunn/fzf)
-* [https://github.com/junegunn/fzf?tab=readme-ov-file#setting-up-shell-integration](https://github.com/junegunn/fzf?tab=readme-ov-file#setting-up-shell-integration)
+* [https://code.visualstudio.com/docs/setup/linux#_install-vs-code-on-linux](https://code.visualstudio.com/docs/setup/linux#_install-vs-code-on-linux)
+* [https://docs.astral.sh/uv/getting-started/installation/#installation-methods](https://docs.astral.sh/uv/getting-started/installation/#installation-methods)
+* [https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+
 

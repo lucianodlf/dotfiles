@@ -1,16 +1,20 @@
-# List path components, one per line
-function path() { echo -e ${PATH//:/\\n}; }
+#!/bin/bash
 
-# Convert hex to decimal
+# Funciones de shell compartidas.
+
+# Lista los componentes del PATH, uno por línea.
+function path() { echo -e ${PATH//:/\n}; }
+
+# Convierte hexadecimal a decimal.
 function h2d() { printf '%d\n' 0x"$1"; }
 
-# Convert decimal to hex
+# Convierte decimal a hexadecimal.
 function d2h() { printf '%x\n' "$1"; }
 
 # git log --author
 function gla() { git log --author "$1"; }
 
-# Print out a color table
+# Imprime una tabla de colores.
 function colours() {
   for i in {0..255}; do
     if ((i < 10)); then
@@ -28,27 +32,24 @@ function colours() {
   printf "\x1b[0m\n"
 }
 
-# wh = "who has" -- print the process listening on PORT
+# Muestra el proceso que escucha en un PUERTO.
 function wh() {
   if [[ $# -eq 0 ]]; then
-    echo "usage: wh PORT"
+    echo "uso: wh PUERTO"
   else
-    PID=$(netstat -vanp tcp | grep "\*\.$1 " | awk '{ print $9 }')
+    PID=$(netstat -vanp tcp | grep "\*.$1 " | awk '{ print $9 }')
     if [[ ${PID} -eq 0 ]]; then
-      echo "no pid for port $1"
+      echo "no hay pid para el puerto $1"
     else
         ps -a "${PID}"
     fi
   fi
 }
 
-# Inspired by Brett Terpstra
-# Imagine you've made a typo in a command, e.g., `car foo.txt`
-# You want to rerun the previous command, changing the first instance of `car` to `cat`
-# Just run `fix car cat`
+# Corrige un error tipográfico en el comando anterior.
 function fix() {
   if [[ $# -ne 2 ]]; then
-    echo "usage: fix [bad] [good]"
+    echo "uso: fix [malo] [bueno]"
   else
     local cmd
     cmd=$(fc -ln -1 | sed -e 's/^ +//' | sed -e "s/$1/$2/")
@@ -56,7 +57,7 @@ function fix() {
   fi
 }
 
-# Decode a URL
+# Decodifica una URL.
 function urldecode() {
   echo -e "$(sed 's/+/ /g;s/%\(..\)/\\x\1/g;')"
 }
@@ -64,22 +65,22 @@ function urldecode() {
 # ls -l which $($1)
 function lw() {
   if [[ $# -eq 0 ]]; then
-    echo "usage: lw <executable>"
+    echo "uso: lw <ejecutable>"
   else
     eza -alm $(which "$1")
   fi
 }
 
-# Download check
+# Comprobación de descargas
 dlc() {
   if [[ $# -ne 3 ]]; then
-    echo "usage: dlc <algorithm> <expected> <file>"
+    echo "uso: dlc <algoritmo> <esperado> <archivo>"
   else
     case $1 in
       md5|5) command echo "$2" "$3" | md5sum --check ;;
       sha256|256) command echo "$2" "$3" | sha256sum --check ;;
       sha512|512) command echo "$2" "$3" | sha512sum --check ;;
-      *) echo "algorithm must be md5, sha256, or sha512" ;;
+      *) echo "el algoritmo debe ser md5, sha256 o sha512" ;;
     esac
   fi
 }

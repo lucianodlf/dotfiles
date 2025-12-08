@@ -63,11 +63,6 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# Cargar variables de entorno
-if [ -f "$ENV_FILE" ]; then
-    source "$ENV_FILE"
-fi
-
 # Cargar configuración compartida de shell
 if [ -f "$CONFIG_DIR/.shell_config" ]; then
     source "$CONFIG_DIR/.shell_config"

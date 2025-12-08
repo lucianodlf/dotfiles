@@ -17,3 +17,5 @@ zsh-autosuggestions
 zsh-syntax-highlighting
 neovim
 tmuxp
+fzf
+firefox

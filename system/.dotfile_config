@@ -58,5 +58,16 @@ export TPM_PATH="$TMUX_PLUGINS_DIR/tpm"
 export TMUX_CONF_SOURCE="$PROJECT_DIR/tmux/.tmux.conf"
 export TMUX_CONF_TARGET="$HOME/.tmux.conf"
 
+# Archivos de origen y destino de .zsh_custom
+export ZSH_CUSTOM_SOURCE="$PROJECT_DIR/zsh/.zsh_custom"
+export ZSH_CUSTOM_TARGET="$HOME/.zsh_custom"
+
+# Archivos de origen y destino de .eslintrc.json y .vimrc
+export ESLINTRC_SOURCE="$PROJECT_DIR/editors/.eslintrc.json"
+export ESLINTRC_TARGET="$HOME/.eslintrc.json"
+export VIMRC_SOURCE="$PROJECT_DIR/editors/vim/.vimrc"
+export VIMRC_TARGET="$HOME/.vimrc"
+
 # Archivo de log
-export LOG_FILE="$PROJECT_DIR/install-$(date +'%Y-%m-%d_%H-%M-%S').log"
+export LOG_DIR="$PROJECT_DIR/logs"
+export LOG_FILE="$LOG_DIR/install-$(date +'%Y-%m-%d_%H-%M-%S').log"

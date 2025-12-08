@@ -2,12 +2,29 @@
 
 # Configuración compartida para shells bash y zsh.
 
+# Establecer un PATH más completo
+export PATH="$PATH:$HOME/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$HOME/.local/bin"
+
+# Eliminar entradas duplicadas del PATH
+typeset -U PATH
+
+# Configuración de NVM (Node Version Manager)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # Carga nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # Carga la completación de nvm para bash
+
+# Establecer la ubicación de los modelos de Ollama
+export OLLAMA_MODELS='/home/rafiki/ollama/models'
+
 # Configuración de Pyenv
 export PYENV_ROOT="$HOME/.pyenv"
 if [ -d "$PYENV_ROOT/bin" ]; then
   export PATH="$PYENV_ROOT/bin:$PATH"
   eval "$(pyenv init -)"
 fi
+
+# Alias para lazydocker
+alias lzd='lazydocker'
 
 # Inicialización de Starship
 if command -v starship >/dev/null 2>&1; then
@@ -19,29 +36,59 @@ if command -v uv >/dev/null 2>&1; then
   eval "$(uv generate-shell-completion $(basename "$SHELL"))"
 fi
 
-# Cargar alias generales
-if [ -f "$ALIASES_FILE" ]; then
-    source "$ALIASES_FILE"
+# Cargar funciones de Zsh si existen
+if [ -f "$PROJECT_DIR/system/functions.zsh" ]; then
+    source "$PROJECT_DIR/system/functions.zsh"
 fi
 
-# User configuration
-# export MANPATH="/usr/local/man:$MANPATH"
+# Aumentar el límite de archivos abiertos
+ulimit -n 2048
 
-# You may need to manually set your language environment
-export LANG=es_ES.UTF-8
+# Cargar plugins de Zsh si existen
+SHARE="${PACKAGES:-/usr}"
+[ -f "$SHARE/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ] && source "$SHARE/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+[ -f "$SHARE/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ] && source "$SHARE/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-export EDITOR='nvim'
+# FZF
 
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
+if command -v fzf >/dev/null 2>&1; then
 
-## ???
-export DISABLE_AUTO_TITLE='true'
+  export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*" --glob "!node_modules/*" --glob "!vendor/*" --glob "!build/*" --glob "!dist/*" --glob "!target/*" --glob "!.idea/*" --glob "!.cache/*"'
 
-## More...
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+  export FZF_DEFAULT_OPTS='
+
+  --height 30%
+
+  --border
+
+  --cycle
+
+  --prompt=" "
+
+  --pointer="▶"
+
+  --marker="✓"
+
+  '
+
+  if [ -n "$BASH_VERSION" ]; then
+
+    eval "$(fzf --bash)"
+
+  elif [ -n "$ZSH_VERSION" ]; then
+
+    source <(fzf --zsh)
+
+  fi
+
+fi
+
+
+
+# Autocompletado de Zsh
+
+fpath+=~/.zfunc
+
+export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=180'

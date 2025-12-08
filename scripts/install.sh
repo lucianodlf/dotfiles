@@ -94,110 +94,81 @@ function install_oh_my_zsh() {
 
   if [ -d "$HOME/.oh-my-zsh" ]; then
     msg "warn" "Oh My Zsh ya está instalado. Saltando la instalación."
-    return
+  else
+    # Instalar Oh My Zsh de forma no interactiva
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
   fi
 
-  # Instalar Oh My Zsh de forma no interactiva
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-
-  # Establecer Zsh como el shell predeterminado
-  if [ "$SHELL" != "$(which zsh)" ]; then
-    if grep -q "$(which zsh)" /etc/shells; then
-      chsh -s "$(which zsh)"
-      if [ $? -eq 0 ]; then
-        msg "success" "Zsh establecido como el shell predeterminado."
-        source 
-      else
-        msg "error" "No se pudo establecer Zsh como el shell predeterminado."
-      fi
-    else
-      msg "error" "Zsh no es un shell de inicio de sesión válido."
-    fi
-  fi
-}
-
-# Crea un enlace simbólico para el archivo .bashrc.
-function link_bashrc() {
-  msg "info" "Creando enlace simbólico para .bashrc..."
-
-  if [ -f "$BASHRC_TARGET" ]; then
-    msg "warn" "Ya existe un archivo .bashrc. Se creará una copia de seguridad en $BASHRC_TARGET.bak."
-    mv "$BASHRC_TARGET" "$BASHRC_TARGET.bak"
-  fi
-
-  ln -sfv "$BASHRC_SOURCE" "$BASHRC_TARGET"
-  msg "success" "Enlace simbólico para .bashrc creado."
-}
-
-# Crea un enlace simbólico para el archivo .zshrc.
-function link_zshrc() {
-  msg "info" "Creando enlace simbólico para .zshrc..."
-
-  if [ -f "$ZSHRC_TARGET" ]; then
-    msg "warn" "Ya existe un archivo .zshrc. Se creará una copia de seguridad en $ZSHRC_TARGET.bak."
-    mv "$ZSHRC_TARGET" "$ZSHRC_TARGET.bak"
-  fi
-
-  ln -sfv "$ZSHRC_SOURCE" "$ZSHRC_TARGET"
-  msg "success" "Enlace simbólico para .zshrc creado."
-}
-
-# Configura Git con los valores de las variables globales.
-function configure_git() {
-  msg "info" "Configurando Git..."
-
-  if [ ! -f "$GITCONFIG_SOURCE" ]; then
-    msg "error" "No se encontró el archivo de configuración de Git en $GITCONFIG_SOURCE."
+  # Comprobar e intentar establecer Zsh como shell predeterminado
+  local zsh_path
+  zsh_path=$(which zsh)
+  if [ -z "$zsh_path" ]; then
+    msg "error" "Zsh no está instalado o no se encuentra en el PATH. No se puede establecer como predeterminado."
     return 1
   fi
 
-  # Reemplazar los valores de las variables en el archivo .gitconfig
-  sed -e "s/{{GIT_AUTHOR_NAME}}/$GIT_AUTHOR_NAME/g" \
-      -e "s/{{GIT_AUTHOR_EMAIL}}/$GIT_AUTHOR_EMAIL/g" \
-      "$GITCONFIG_SOURCE" > "$GITCONFIG_TARGET"
-
-  msg "success" "Git configurado."
-}
-
-# Crea un enlace simbólico para el archivo .editorconfig.
-function link_editorconfig() {
-  msg "info" "Creando enlace simbólico para .editorconfig..."
-
-  if [ -f "$EDITORCONFIG_TARGET" ]; then
-    msg "warn" "Ya existe un archivo .editorconfig. Se creará una copia de seguridad en $EDITORCONFIG_TARGET.bak."
-    mv "$EDITORCONFIG_TARGET" "$EDITORCONFIG_TARGET.bak"
-  fi
-
-  ln -sfv "$EDITORCONFIG_SOURCE" "$EDITORCONFIG_TARGET"
-  msg "success" "Enlace simbólico para .editorconfig creado."
-}
-
-# Crea un enlace simbólico para el archivo .tmux.conf.
-function link_tmux_conf() {
-  msg "info" "Creando enlace simbólico para .tmux.conf..."
-
-  if [ -f "$TMUX_CONF_TARGET" ]; then
-    if [ -L "$TMUX_CONF_TARGET" ]; then
-        rm "$TMUX_CONF_TARGET"
-    else
-        msg "warn" "Ya existe un archivo .tmux.conf no simbólico. Se creará una copia de seguridad en $TMUX_CONF_TARGET.bak."
-        mv "$TMUX_CONF_TARGET" "$TMUX_CONF_TARGET.bak"
+  if ! grep -q "$zsh_path" /etc/shells; then
+    msg "info" "Añadiendo Zsh a los shells válidos..."
+    echo "$zsh_path" | sudo tee -a /etc/shells > /dev/null
+    if [ $? -ne 0 ]; then
+      msg "error" "No se pudo añadir Zsh a /etc/shells. Se necesitan privilegios de administrador."
+      return 1
     fi
   fi
 
-  ln -sfv "$TMUX_CONF_SOURCE" "$TMUX_CONF_TARGET"
-  msg "success" "Enlace simbólico para .tmux.conf creado."
+  if [ "$SHELL" != "$zsh_path" ]; then
+    chsh -s "$zsh_path"
+    if [ $? -eq 0 ]; then
+      msg "success" "Zsh establecido como el shell predeterminado. Por favor, cierre sesión y vuelva a iniciarla para que los cambios surtan efecto."
+    else
+      msg "error" "No se pudo establecer Zsh como el shell predeterminado. Inténtelo manualmente con: chsh -s $zsh_path"
+    fi
+  else
+    msg "info" "Zsh ya es el shell predeterminado."
+  fi
 }
 
-# Otros enlaces
-function link_others() {
-  msg "info" "Creando enlace simbólico para remplazar cat (batcat)..."
+# Crea todos los enlaces simbólicos para los dotfiles.
+function link_dotfiles() {
+  msg "info" "Creando enlaces simbólicos para los dotfiles..."
 
-  # Link bat for batcat (replace cat)
-  mkdir -p ~/.local/bin
-  ln -fsv /usr/bin/batcat ~/.local/bin/bat
+  local source_target_pairs=(
+    "$BASHRC_SOURCE:$BASHRC_TARGET"
+    "$ZSHRC_SOURCE:$ZSHRC_TARGET"
+    "$EDITORCONFIG_SOURCE:$EDITORCONFIG_TARGET"
+    "$ZSH_CUSTOM_SOURCE:$ZSH_CUSTOM_TARGET"
+    "$ESLINTRC_SOURCE:$ESLINTRC_TARGET"
+    "$VIMRC_SOURCE:$VIMRC_TARGET"
+    "$TMUX_CONF_SOURCE:$TMUX_CONF_TARGET"
+  )
 
-  msg "success" "Enlace simbólico para .tmux.conf creado."
+  for pair in "${source_target_pairs[@]}"; do
+    local source="${pair%%:*}"
+    local target="${pair##*:}"
+    local target_name
+
+    target_name=$(basename "$target")
+
+    # Si el objetivo existe, crea una copia de seguridad.
+    if [ -e "$target" ] || [ -L "$target" ]; then
+      if [ -L "$target" ]; then
+        rm -f "$target"
+      else
+        msg "warn" "Ya existe '$target_name'. Creando copia de seguridad en '$target.bak'."
+        mv -f "$target" "$target.bak"
+      fi
+    fi
+
+    # Crea el enlace simbólico.
+    ln -svf "$source" "$target"
+  done
+
+  # Enlaces adicionales que no son dotfiles directos.
+  msg "info" "Creando enlaces simbólicos adicionales..."
+  mkdir -p "$HOME/.local/bin"
+  ln -sfv /usr/bin/batcat "$HOME/.local/bin/bat"
+
+  msg "success" "Enlaces simbólicos creados."
 }
 
 # Instala TPM (Tmux Plugin Manager) y los plugins configurados.
@@ -235,39 +206,68 @@ function install_tpm_plugins() {
   fi
 }
 
+# Verifica la instalación de los plugins de Zsh.
+function verify_zsh_plugins() {
+  msg "info" "Verificando la instalación de los plugins de Zsh..."
+  local a_plugin_path="/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  local s_plugin_path="/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
+  if [ -f "$a_plugin_path" ]; then
+    msg "success" "zsh-autosuggestions encontrado en $a_plugin_path."
+  else
+    msg "error" "zsh-autosuggestions no se encontró en la ruta esperada."
+  fi
+
+  if [ -f "$s_plugin_path" ]; then
+    msg "success" "zsh-syntax-highlighting encontrado en $s_plugin_path."
+  else
+    msg "error" "zsh-syntax-highlighting no se encontró en la ruta esperada."
+  fi
+}
+
 # ---
 # Flujo Principal
 # ---
 
 function main() {
+  mkdir -p "$LOG_DIR"
   msg "info" "Iniciando la instalación de los dotfiles..."
   
-  # Instalar paquetes
-  install_packages
+    # Instalar paquetes
+    install_packages
   
-  # Instalar Oh My Zsh
-  install_oh_my_zsh
-
-  # Crear enlaces simbólicos
-  link_bashrc
-  link_zshrc
-  link_editorconfig
-  link_others
-
-  # Configurar Git
-  configure_git
-
-  # Enlazar .tmux.conf e instalar plugins de TPM
-  if command_exists "tmux"; then
-    link_tmux_conf
-    install_tpm_plugins
-  else
-    msg "warn" "Tmux no está instalado. Saltando la configuración de TPM y plugins."
-  fi
-
-  msg "success" "¡Instalación de dotfiles completada!"
-  msg "info" "source $BASHRC_TARGET"
-  source "$BASHRC_TARGET"
-}
+    # Verificar fzf
+    if ! command_exists "fzf"; then
+          msg "warn" "fzf no está instalado. La integración con el shell se omitirá."
+        fi
+      
+        # Verificar plugins de Zsh
+        verify_zsh_plugins
+      
+        # Instalar Oh My Zsh
+        install_oh_my_zsh    
+      # Crear enlaces simbólicos
+      link_dotfiles
+    
+      # Configurar Git
+      configure_git
+    
+      # Enlazar .tmux.conf e instalar plugins de TPM
+        if command_exists "tmux"; then
+          install_tpm_plugins
+        else
+          msg "warn" "Tmux no está instalado. Saltando la configuración de TPM y plugins."
+        fi
+      
+        # Ejecutar script de post-instalación adicional si existe
+        if [ -f "$SCRIPTS_DIR/aditionals-postinstall.sh" ]; then
+          read -p "¿Desea ejecutar los pasos adicionales de post-instalación? (s/n): " -n 1 -r
+          echo
+          if [[ $REPLY =~ ^[Ss]$ ]]; then
+            bash "$SCRIPTS_DIR/aditionals-postinstall.sh"
+          fi
+        fi
+      
+        msg "success" "¡Instalación de dotfiles completada!"
 
 main "$@"
