@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Este archivo contiene variables de configuración compartidas que pueden ser
+# utilizadas por otros scripts y archivos de configuración.
+USER_NAME="LucianoDlf"
+USER_EMAIL="luciano.dlf@gmail.com"
+
+# Configuración de Git
+GIT_AUTHOR_NAME="$USER_NAME"
+GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
+GIT_AUTHOR_EMAIL="$USER_EMAIL"
+GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
+
+# Otras configuraciones del proyecto
+PROJECT_NAME="dotfiles"
+PROJECT_URL="https://github.com/rafiki-dev/dotfiles"
+
+# ---
+# Rutas del proyecto
+# ---
+
+# Directorio raíz del proyecto
+# Nota: Esta variable debe ser establecida por el script que la invoca.
+# Ejemplo: readonly PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/.."
+if [ -z "$PROJECT_DIR" ]; then
+    export PROJECT_DIR="$HOME/dotfiles"
+fi
+
+export CONFIG_DIR="$PROJECT_DIR/system"
+export SCRIPTS_DIR="$PROJECT_DIR/scripts"
+
+# Archivos de configuración
+export DOTFILE_CONFIG="$CONFIG_DIR/.dotfile_config"
+export ALIASES_FILE="$CONFIG_DIR/.aliases"
+export ENV_FILE="$CONFIG_DIR/.env"
+
+# Archivos de origen y destino de .bashrc
+export BASHRC_SOURCE="$PROJECT_DIR/bash/.bashrc"
+export BASHRC_TARGET="$HOME/.bashrc"

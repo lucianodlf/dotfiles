@@ -1,0 +1,84 @@
+# Comandos de navegación
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias .....="cd ../../../.."
+
+#TMP de proyectos
+alias inncd='cd ~/Projects/app-innovat'
+alias innup='cd ~/Projects/app-innovat && dk compose -f dev.yml up'
+alias innbe='(cd ~/Projects/app-innovat/backend && code .)'
+alias innfe='(cd ~/Projects/app-innovat/frontend && code .)'
+
+#SSH
+alias sshinn='ssh fede@ingarue.santafe-conicet.gov.ar'
+
+# Utilidades generales
+alias cat='bat --theme TwoDark'
+alias cpwd='pwd | tr -d "\n" | pbcopy'
+alias l='ls -la'
+alias ll="ls -alF --color=auto"
+alias ls="ls -A --color=auto"
+alias lt='tree'
+alias pubkey='pbcopy < ~/.ssh/id_ed25519.pub'
+alias sz='source ~/.zshrc'
+alias web='python -m http.server'
+alias cc="clear"
+alias c="clear"
+alias path='echo -e ${PATH//:/\n}'
+alias now='date +"%T"'
+alias nowdate='date +"%d-%m-%Y"'
+
+# Copiar y pegar en el portapapeles (para Linux y macOS)
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+  alias xclipc='xclip -in -selection clip'
+  alias xclipp='xclip -out -selection clip'
+  alias pbcopy='xclip -in -selection clip'
+  alias pbpaste='xclip -out -selection clip'
+fi
+
+# Git
+alias g='git'
+#alias git='hub'
+alias clone='git clone'
+alias gbls="git for-each-ref --format='%(committerdate) %09 %(authorname) %09 %(refname)' | sort -k5n -k2M -k3n -k4n"
+alias gcm='git commit -m'
+alias get='git'
+#alias gfa='git fetch --all'
+#alias gkd='git ksdiff'
+alias glc='git log -p --follow -n 1'
+alias gs='git status'
+alias gti='git'
+alias merge='git merge'
+alias pull='git pull'
+alias push='git push'
+alias switch='git switch'
+unalias gbs
+unalias gbd
+
+# Docker
+alias dcls="sudo docker container ls"
+alias dcps="sudo docker container ps"
+alias dcstr="sudo docker container start"
+alias dcstp="sudo docker container stop"
+alias dk="sudo docker"
+alias dke='sudo docker exec -it'
+alias dki='sudo docker images'
+alias dkl='sudo docker logs -f'
+alias dkrm='sudo docker rm -f'
+alias dkrmi='sudo docker rmi'
+alias dkpsa='sudo docker ps -a'
+
+# Kubernetes
+alias k='kubectl'
+alias ka='kubectl apply -f'
+alias kex='kubectl exec -i -t'
+alias kg='kubectl get'
+alias kgd='kubectl get deployment'
+alias kgp='kubectl get pod'
+alias kgs='kubectl get service'
+alias kda='kubectl describe'
+alias kdp='kubectl describe pod'
+alias kds='kubectl describe service'
+alias kl='kubectl logs -f'
+alias krm='kubectl delete'

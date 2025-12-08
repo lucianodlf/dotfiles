@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<channel name="xfce4-panel" version="1.0">
+  <property name="configver" type="empty"/>
+  <property name="panels" type="empty">
+    <property name="panel-1" type="empty">
+      <property name="position" type="empty"/>
+      <property name="length" type="empty"/>
+      <property name="position-locked" type="empty"/>
+      <property name="size" type="empty"/>
+      <property name="background-style" type="empty"/>
+      <property name="background-alpha" type="empty"/>
+      <property name="enter-opacity" type="empty"/>
+      <property name="leave-opacity" type="empty"/>
+      <property name="plugin-ids" type="empty"/>
+    </property>
+  </property>
+  <property name="plugins" type="empty">
+    <property name="plugin-1" type="empty"/>
+    <property name="plugin-2" type="empty"/>
+    <property name="plugin-3" type="empty">
+      <property name="items" type="array">
+        <value type="string" value="17219117201.desktop"/>
+      </property>
+    </property>
+    <property name="plugin-4" type="empty">
+      <property name="items" type="array">
+        <value type="string" value="17219117202.desktop"/>
+      </property>
+    </property>
+    <property name="plugin-5" type="empty">
+      <property name="items" type="array">
+        <value type="string" value="17219117203.desktop"/>
+      </property>
+    </property>
+    <property name="plugin-6" type="empty">
+      <property name="show-handle" type="empty"/>
+      <property name="middle-click" type="empty"/>
+    </property>
+    <property name="plugin-7" type="empty">
+      <property name="expand" type="empty"/>
+      <property name="style" type="empty"/>
+    </property>
+    <property name="plugin-8" type="empty">
+      <property name="names-visible" type="empty"/>
+      <property name="show-frame" type="empty"/>
+      <property name="known-items" type="array">
+        <value type="string" value="fluxgui-indicator"/>
+        <value type="string" value="blueman"/>
+      </property>
+    </property>
+    <property name="plugin-9" type="empty"/>
+    <property name="plugin-10" type="empty"/>
+    <property name="plugin-11" type="empty"/>
+    <property name="plugin-12" type="empty">
+      <property name="enable-keyboard-shortcuts" type="empty"/>
+      <property name="enable-mpris" type="empty"/>
+      <property name="mixer-command" type="empty"/>
+      <property name="show-notifications" type="empty"/>
+      <property name="mpris-players" type="string" value="chromium.instance10345;chromium.instance124817;chromium.instance391261;chromium.instance71861;firefox.instance_1_108;firefox.instance_1_1149;firefox.instance_1_5582;firefox.instance_1_5588;firefox.instance_1_67;firefox.instance_1_68;firefox.instance_1_69;firefox.instance_1_70;firefox.instance_1_71;firefox.instance_1_72;firefox.instance_1_77;firefox.instance_1_96;io.github.celluloid_player.Celluloid.instance-1"/>
+    </property>
+    <property name="plugin-13" type="empty">
+      <property name="digital-time-format" type="empty"/>
+      <property name="digital-layout" type="empty"/>
+      <property name="digital-date-font" type="empty"/>
+      <property name="digital-time-font" type="empty"/>
+    </property>
+    <property name="plugin-14" type="empty"/>
+  </property>
+</channel>

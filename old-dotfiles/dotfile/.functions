@@ -1,0 +1,5 @@
+# Desinstalar paquetes de idiomas libreoffice que no sean español
+function purge_lnuloff() {
+ sudo apt purge $(apt list --installed | grep 'libreoffice-l10n-' | cut -d'/' -f1 | grep -v 'libreoffice-l10n-es')
+}
+
