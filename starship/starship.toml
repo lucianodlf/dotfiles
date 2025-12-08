@@ -1,0 +1,45 @@
+# ~/.config/starship.toml
+
+# Configuración de Starship prompt
+format = "[ \$character](bold green) "
+
+add_newline = false
+
+[gcloud]
+disabled = true
+
+[character]
+success_symbol = "[➜](bold green)"
+error_symbol = "[✗](bold red)"
+
+[username]
+show_always = true
+style_user = "bold yellow"
+style_root = "bold red"
+format = "[$user]($style)@ "
+
+[hostname]
+ssh_only = false
+style = "bold blue"
+format = "[$hostname]($style) "
+
+[directory]
+truncation_length = 3
+truncate_to_repo = true
+style = "bold cyan"
+format = "[ $path ]($style)"
+
+[git_branch]
+symbol = " "
+style = "bold purple"
+format = "[$symbol$branch]($style)"
+
+[git_status]
+style = "bold red"
+format = "([$all_status$ahead_behind]($style))"
+
+[time]
+disabled = false
+style = "bold white"
+format = "[$time]($style) "
+time_format = "%H:%M:%S"

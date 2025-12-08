@@ -50,8 +50,13 @@ if [ -x /usr/bin/dircolors ]; then
 fi
 
 # Cargar variables de configuración del proyecto
-if [ -f "$HOME/dotfiles/system/.dotfile_config" ]; then
-    source "$HOME/dotfiles/system/.dotfile_config"
+if [ -f "$PROJECT_DIR/system/.dotfile_config" ]; then
+    source "$PROJECT_DIR/system/.dotfile_config"
+fi
+
+# Cargar alias generales.
+if [ -f "$ALIASES_FILE" ]; then
+    source "$ALIASES_FILE"
 fi
 
 # Habilitar las funciones de autocompletado programable.
@@ -67,3 +72,5 @@ fi
 if [ -f "$CONFIG_DIR/.shell_config" ]; then
     source "$CONFIG_DIR/.shell_config"
 fi
+
+. "$HOME/.local/bin/env"

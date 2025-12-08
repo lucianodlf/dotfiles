@@ -1,9 +1,31 @@
+# ~/.inputrc
+# Este archivo configura el comportamiento de GNU Readline, usado por Bash y otras shells.
+
+# Incluir la configuración global del sistema. Las configuraciones de este archivo la anularán.
 $include /etc/inputrc
 
+# ---
+# Modo de Edición
+# ---
+# 'vi' para modo de edición tipo Vi, 'emacs' para el predeterminado.
 set editing-mode vi
-set colored-stats On
+
+# ---
+# Comportamiento del Autocompletado
+# ---
+# Ignorar mayúsculas y minúsculas al autocompletar.
 set completion-ignore-case On
-set mark-symlinked-directories On
+# Mostrar todas las posibles terminaciones si hay ambigüedad.
 set show-all-if-ambiguous On
+# Mostrar las posibles terminaciones incluso si no ha cambiado nada.
 set show-all-if-unmodified On
+
+# ---
+# Apariencia y Feedback
+# ---
+# Usar colores para diferentes tipos de archivos.
+set colored-stats On
+# Añadir un '/' al final de los enlaces simbólicos a directorios.
+set mark-symlinked-directories On
+# Mostrar estadísticas de los archivos (tipo) al listar terminaciones.
 set visible-stats On

@@ -140,6 +140,7 @@ function link_dotfiles() {
     "$ESLINTRC_SOURCE:$ESLINTRC_TARGET"
     "$VIMRC_SOURCE:$VIMRC_TARGET"
     "$TMUX_CONF_SOURCE:$TMUX_CONF_TARGET"
+    "$INPUTRC_SOURCE:$INPUTRC_TARGET"
   )
 
   for pair in "${source_target_pairs[@]}"; do
@@ -244,30 +245,31 @@ function main() {
         # Verificar plugins de Zsh
         verify_zsh_plugins
       
-        # Instalar Oh My Zsh
-        install_oh_my_zsh    
-      # Crear enlaces simbólicos
-      link_dotfiles
-    
-      # Configurar Git
-      configure_git
-    
-      # Enlazar .tmux.conf e instalar plugins de TPM
-        if command_exists "tmux"; then
-          install_tpm_plugins
-        else
-          msg "warn" "Tmux no está instalado. Saltando la configuración de TPM y plugins."
-        fi
-      
-        # Ejecutar script de post-instalación adicional si existe
-        if [ -f "$SCRIPTS_DIR/aditionals-postinstall.sh" ]; then
-          read -p "¿Desea ejecutar los pasos adicionales de post-instalación? (s/n): " -n 1 -r
-          echo
-          if [[ $REPLY =~ ^[Ss]$ ]]; then
-            bash "$SCRIPTS_DIR/aditionals-postinstall.sh"
+            # Instalar Oh My Zsh
+            install_oh_my_zsh    
+          # Crear enlaces simbólicos
+          link_dotfiles
+        
+          # Configurar Git
+          configure_git
+        
+          # Enlazar .tmux.conf e instalar plugins de TPM
+          if command_exists "tmux"; then
+            install_tpm_plugins
+          else
+            msg "warn" "Tmux no está instalado. Saltando la configuración de TPM y plugins."
           fi
-        fi
-      
-        msg "success" "¡Instalación de dotfiles completada!"
-
-main "$@"
+        
+          # Ejecutar script de post-instalación adicional si existe
+          if [ -f "$SCRIPTS_DIR/aditionals-postinstall.sh" ]; then
+            read -p "¿Desea ejecutar los pasos adicionales de post-instalación? (s/n): " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Ss]$ ]]; then
+              bash "$SCRIPTS_DIR/aditionals-postinstall.sh"
+            fi
+          fi
+        
+            msg "success" "¡Instalación de dotfiles completada!"
+            msg "info" "Por favor, reinicie su shell o ejecute 'source ~/.bashrc' para aplicar los cambios."
+          }        
+        main "$@"

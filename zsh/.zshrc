@@ -1,5 +1,10 @@
 # ~/.zshrc: ejecutado por zsh(1) para shells interactivos.
 
+# Cargar variables de configuración del proyecto
+if [ -f "$HOME/dotfiles/system/.dotfile_config" ]; then
+    source "$HOME/dotfiles/system/.dotfile_config"
+fi
+
 # Path a la instalación de oh-my-zsh.
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -76,9 +81,13 @@ if [ -f "$ZSH/oh-my-zsh.sh" ]; then
     source "$ZSH/oh-my-zsh.sh"
 fi
 
+# Cargar alias generales.
+if [ -f "$ALIASES_FILE" ]; then
+    source "$ALIASES_FILE"
+fi
+
 # Cargar configuración compartida de shell.
 if [ -f "$CONFIG_DIR/.shell_config" ]; then
     source "$CONFIG_DIR/.shell_config"
 fi
-
-
+. "$HOME/.local/bin/env"

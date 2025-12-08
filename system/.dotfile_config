@@ -68,6 +68,10 @@ export ESLINTRC_TARGET="$HOME/.eslintrc.json"
 export VIMRC_SOURCE="$PROJECT_DIR/editors/vim/.vimrc"
 export VIMRC_TARGET="$HOME/.vimrc"
 
+# Archivos de origen y destino de .inputrc
+export INPUTRC_SOURCE="$PROJECT_DIR/system/.inputrc"
+export INPUTRC_TARGET="$HOME/.inputrc"
+
 # Archivo de log
 export LOG_DIR="$PROJECT_DIR/logs"
 export LOG_FILE="$LOG_DIR/install-$(date +'%Y-%m-%d_%H-%M-%S').log"
