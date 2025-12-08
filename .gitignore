@@ -24,7 +24,7 @@ tags.*
 nvim/lazy-lock.json
 
 #tmp
-#tmp/
+tmp/
 logs/
 
 .bash_history

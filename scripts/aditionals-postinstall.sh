@@ -92,10 +92,23 @@ function install_uv() {
 
   curl -LsSf https://astral.sh/uv/install.sh | sh
   # Añadir uv al PATH para la sesión actual
-  source "$HOME/.cargo/env"
+  # La instalación de uv se realiza en $HOME/.local/bin
+  source "$HOME/.local/bin/env"
 
   if command_exists "uv"; then
     msg "success" "uv instalado correctamente."
+    # Agregar los comandos de autocompletado según el tipo de shell
+    if [ -n "$ZSH_VERSION" ]; then
+      echo 'eval "$(uv generate-shell-completion zsh)"' >> ~/.zshrc
+      echo 'eval "$(uvx --generate-shell-completion zsh)"' >> ~/.zshrc
+      msg "info" "Completado de uv y uvx para zsh añadido a ~/.zshrc."
+    elif [ -n "$BASH_VERSION" ]; then
+      echo 'eval "$(uv generate-shell-completion bash)"' >> ~/.bashrc
+      echo 'eval "$(uvx --generate-shell-completion bash)"' >> ~/.bashrc
+      msg "info" "Completado de uv y uvx para bash añadido a ~/.bashrc."
+    else
+      msg "warn" "Shell no reconocido. No se añadió el completado de uv/uvx."
+    fi
   else
     msg "error" "No se pudo instalar uv."
   fi

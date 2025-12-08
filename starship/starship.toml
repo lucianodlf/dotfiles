@@ -1,7 +1,7 @@
 # ~/.config/starship.toml
 
 # Configuración de Starship prompt
-format = "[ \$character](bold green) "
+#format = "[$character](bold green)"
 
 add_newline = false
 
