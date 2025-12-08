@@ -54,11 +54,6 @@ if [ -f "$HOME/dotfiles/system/.dotfile_config" ]; then
     source "$HOME/dotfiles/system/.dotfile_config"
 fi
 
-# Cargar alias generales
-if [ -f "$ALIASES_FILE" ]; then
-    source "$ALIASES_FILE"
-fi
-
 # Habilitar las funciones de autocompletado programable.
 if ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
@@ -71,4 +66,9 @@ fi
 # Cargar variables de entorno
 if [ -f "$ENV_FILE" ]; then
     source "$ENV_FILE"
+fi
+
+# Cargar configuración compartida de shell
+if [ -f "$CONFIG_DIR/.shell_config" ]; then
+    source "$CONFIG_DIR/.shell_config"
 fi

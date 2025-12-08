@@ -53,8 +53,6 @@ alias merge='git merge'
 alias pull='git pull'
 alias push='git push'
 alias switch='git switch'
-unalias gbs
-unalias gbd
 
 # Docker
 alias dcls="sudo docker container ls"
@@ -82,3 +80,6 @@ alias kdp='kubectl describe pod'
 alias kds='kubectl describe service'
 alias kl='kubectl logs -f'
 alias krm='kubectl delete'
+
+# Lazydocker
+alias lzd='lazydocker'

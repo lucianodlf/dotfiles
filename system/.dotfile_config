@@ -33,7 +33,30 @@ export SCRIPTS_DIR="$PROJECT_DIR/scripts"
 export DOTFILE_CONFIG="$CONFIG_DIR/.dotfile_config"
 export ALIASES_FILE="$CONFIG_DIR/.aliases"
 export ENV_FILE="$CONFIG_DIR/.env"
+export PKGLIST_FILE="$CONFIG_DIR/pkglist"
 
 # Archivos de origen y destino de .bashrc
 export BASHRC_SOURCE="$PROJECT_DIR/bash/.bashrc"
 export BASHRC_TARGET="$HOME/.bashrc"
+
+# Archivos de origen y destino de .zshrc
+export ZSHRC_SOURCE="$PROJECT_DIR/zsh/.zshrc"
+export ZSHRC_TARGET="$HOME/.zshrc"
+
+# Archivos de origen y destino de .gitconfig
+export GITCONFIG_SOURCE="$PROJECT_DIR/git/.gitconfig"
+export GITCONFIG_TARGET="$HOME/.gitconfig"
+
+# Archivos de origen y destino de .editorconfig
+export EDITORCONFIG_SOURCE="$PROJECT_DIR/editors/.editorconfig"
+export EDITORCONFIG_TARGET="$HOME/.editorconfig"
+
+# Variables de Tmux
+export TMUX_PLUGINS_DIR="$HOME/.tmux/plugins"
+export TPM_REPO="https://github.com/tmux-plugins/tpm"
+export TPM_PATH="$TMUX_PLUGINS_DIR/tpm"
+export TMUX_CONF_SOURCE="$PROJECT_DIR/tmux/.tmux.conf"
+export TMUX_CONF_TARGET="$HOME/.tmux.conf"
+
+# Archivo de log
+export LOG_FILE="$PROJECT_DIR/install-$(date +'%Y-%m-%d_%H-%M-%S').log"

@@ -1,0 +1,23 @@
+[user]
+	name = {{GIT_AUTHOR_NAME}}
+	email = {{GIT_AUTHOR_EMAIL}}
+[push]
+	default = current
+[core]
+	autocrlf = input
+	fileMode = false	
+	editor = nvim
+[alias]
+	st = status
+	co = checkout
+	br = branch --list --color
+	ci = commit
+	rt = remote
+	last = log -1 HEAD
+	unstage = reset HEAD --
+	lg = log --oneline --graph --name-only
+	ll = log --pretty=format:"%h %s" --graph --color --color-words
+[init]
+	defaultBranch = main
+[pull]
+	rebase = true

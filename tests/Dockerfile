@@ -1,28 +1,25 @@
 # Usa una imagen base limpia (ej. Ubuntu, Alpine, Debian)
 FROM ubuntu:22.04
 
-# Instala Git y cualquier otra dependencia necesaria para tu script
-#RUN apt-get update && apt-get install -y curl vim tree nano
+# Actualiza repos e instala herramientas necesarias
+RUN apt-get update && apt-get install -y curl vim tree nano passwd sudo
 
-RUN apt-get install -y curl vim tree nano
-
+# Crear usuario 'rafiki' con home
 RUN useradd -m rafiki
-# 4. Copia tus dotfiles (idealmente aquí es donde los copias al home del nuevo user)
-#    Nota: Si usas COPY ., los archivos pertenecerán inicialmente a root. 
-#    Puedes usar --chown para asegurarte de que 'appuser' sea el dueño.
+RUN usermod -aG sudo rafiki
+
+# Configurar password 'test' para el usuario 'rafiki'
+RUN echo "rafiki:test" | chpasswd
+RUN echo "root:test" | chpasswd
+
+# Copia los dotfiles con el owner correcto
 COPY --chown=rafiki:rafiki . /home/rafiki/dotfiles
 
-# Copia tu repositorio de dotfiles al contenedor
-#COPY . /home/rafiki/dotfiles
-
-# 6. Define el usuario con el que se ejecutará el contenedor
+# Define el usuario con el que se ejecutará el contenedor
 USER rafiki
 
 # Establece el directorio de trabajo
 WORKDIR /home/rafiki/
 
-# Ejecuta el script de instalación (asegúrate de que sea ejecutable)
-#RUN ./install.sh
-
-# Opcional: Define un comando por defecto para mantener el contenedor ejecutándose
+# Comando por defecto
 CMD ["/bin/bash"]

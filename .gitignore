@@ -1,5 +1,3 @@
-references/dotfiles-ref
-
 # Eclipse
 .metadata
 RemoteSystemsTempFiles
@@ -24,4 +22,10 @@ tags.*
 
 # LazyVim
 nvim/lazy-lock.json
+
+#tmp
+#tmp/
+logs/
+
+.bash_history
 

@@ -1,243 +1,198 @@
-# Implementation of Improvements
+# **AI Instruction Prompt — Implementation of Improvements**
 
-**AI Instructions Prompt (English Version)**
-
-You must follow all the instructions below to implement improvements in a dotfiles project.
-Maintain the structure, formatting, and the technical meaning exactly as expressed.
-
----
-
-## 1. Add functionality in `install.sh` to install packages (similar to `install_packages()` in `setup.sh`)
-
-* This functionality must be the **first step** in `main`.
-* Packages must be obtained from a `pkglist` file (create it under `system/`, following the example in `old-dotfiles/dotfile/pkglist`).
-* Always consider creating **global configuration variables** in `.dotfile_config` to reference paths.
-* The installation must be **unattended**.
-* Perform a **repository update** before installation.
+You must implement all the improvements listed below with precision, maintaining full consistency, idempotency, and modularity across the dotfiles project.
+Where “shell_config” is mentioned, it refers to: **`system/.shell_config`**.
+All steps must integrate cleanly with the existing project structure.
 
 ---
 
-## 2. Improve `old-dotfiles/dotfile/.zshrc` following the same criteria used for `.bashrc` and create the new file at `zsh/.zshrc`:
+# **1. Zsh Custom Directory Integration (`ZSH_CUSTOM=$HOME/.zsh_custom`)**
 
-* Import the already-created unified reusable `.aliases` file.
-* If needed, modify that `.aliases` file to include aliases currently in `.zshrc` (avoid duplicates).
-* Add relevant comments.
-* The following code snippet must be used in a modular, separated manner so it can be reused in both `.zshrc` and `.bashrc`:
+Because `export ZSH_CUSTOM=$HOME/.zsh_custom` was added to `zsh/.zshrc`, you must implement the following:
 
-```
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init - bash)"
+### **1.1. Create a symbolic link**
 
-# change ollama_models
-#export OLLAMA_MODELS='/home/rafiki/ollama/models'
+* Add a symlink in the installation process to link `zsh/.zsh_custom` into the user’s home directory according to the current dotfiles structure.
 
-alias lzd='lazydocker'
-eval "$(starship init zsh)"
+### **1.2. Unify configuration into `system/.shell_config`**
 
-eval "$(uv generate-shell-completion zsh)"
-```
+Perform the following consolidations:
 
-* Implement all necessary modifications (use a clear modular/reusable criterion, such as a separate config file under `system/` shared by both shells).
-* Integrate these changes into the new `bash/.bashrc` and `zsh/.zshrc`.
+* Add:
 
----
+  ```bash
+  export PATH="$PATH:$HOME/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+  ```
+* Move all exports currently located in `system/.env` into `system/.shell_config` (avoid duplication).
+* Move all variables/export definitions currently in `zsh/.zsh_custom/env.zsh` into `system/.shell_config`.
+* Once everything is unified, remove:
 
-## 3. Add functionality in `install.sh` to install **Oh My Zsh** (similar to `install_oh_my_zsh()` in `setup.sh`)
+  * `system/.env`
+  * `zsh/.zsh_custom/env.zsh`
+    Ensure code consistency after removal.
 
-* This functionality must be the **second step** in `main`.
-* Reference command:
-  `sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"`
-* Set Zsh as the default shell. Consider using `chsh -s $(which zsh)` and include alternative viable approaches.
-* Verify that Zsh is correctly set as the default shell:
+### **1.3. Plugin availability verification**
 
-  * Check the last field of `grep $USER /etc/passwd`
-  * Check if Zsh is a valid login shell: `grep zsh /etc/shells`
-* Installation must be **unattended**.
-* Verify the installation is correct.
+For the Zsh plugins loaded through:
+
+* `$SHARE/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh`
+* `$SHARE/share/zsh-autosuggestions/zsh-autosuggestions.zsh`
+
+Add logic that:
+
+1. **Verifies that the plugin files exist** after installation.
+2. **Notifies the user** clearly if installation paths are missing or incorrect.
 
 ---
 
-## 4. Update `install.sh` to add the symlink following the example of `link_bashrc`.
+# **2. fzf Integration**
 
----
+Add fzf shell integration exactly as described below, **but only after verifying that the `fzf` package is installed**.
 
-## 5. Update `install.sh` to generate a **log file** of the execution.
+### **2.1. Installation verification**
 
-Messages and errors must be recorded **both in console and in the log file**.
-Include a timestamp in the log filename.
+* In `install.sh`, add logic that checks whether `fzf` is installed and functional.
+* If not installed, print a clear message.
 
----
+### **2.2. Add fzf shell integration**
 
-## 6. Update `install.sh` to add Git configuration functionality, reusing global variables from `system/.dotfile_config`
-
-* This configuration must be integrated, coherent and consistent, producing a `.gitconfig` in `$HOME` that merges:
-
-  * the current `old-dotfiles/dotfile/.gitconfig`
-  * the values of the global variables
-* The new `.gitconfig` must be placed at `git/.gitconfig`.
-* Change `editor = vim` to `editor = nvim`.
-
----
-
-## 7. Modify `install.sh` to create a symbolic link of `editors/.editorconfig` into `$HOME`.
-
----
-
-## 8. Modify `install.sh` to install tmux plugins using **TPM**
-
-([https://github.com/tmux-plugins/tpm](https://github.com/tmux-plugins/tpm))
-
-* Use `old-dotfiles/dotfile/.tmux.conf` as the base.
-* Create a new, organized, well-commented version under `tmux/`.
-* Integrate and automate installation.
-* You may use the following example, but fix anything needed to make it compatible with the current project structure.
-
-BEGIN EXAMPLE (for reference)
--------------
-
-## 🚀 Tmux Plugin Installation Implementation
-
-### 1. Required Configuration Variables
-
-To maintain **modularity**, define the tmux-related variables in your shared configuration file `system/.dotfile_config` (assuming you already have it referenced and loaded in `install.sh`).
+For **bash**:
 
 ```bash
-# system/.dotfile_config (Example)
-# ... other variables ...
-
-# Tmux variables
-TMUX_PLUGINS_DIR="$HOME/.tmux/plugins"
-TPM_REPO="https://github.com/tmux-plugins/tpm"
-TPM_PATH="$TMUX_PLUGINS_DIR/tpm"
+# Set up fzf key bindings and fuzzy completion
+eval "$(fzf --bash)"
 ```
 
-### 2. `install_tpm_plugins()` Function for `install.sh`
+For **zsh**:
 
-Add this function to your `scripts/install.sh` script. Ensure that `tmux` is installed (assumed for this stage).
-
-```bash
-# scripts/install.sh (Add this function in the 'Installation Functions' section)
-# ...
-
-# Create a symbolic link for the .tmux.conf file.
-function link_tmux_conf() {
-  local TMUX_CONF_SOURCE="$PROJECT_DIR/tmux/.tmux.conf" # Assuming this path
-  local TMUX_CONF_TARGET="$HOME/.tmux.conf"
-
-  msg "info" "Creating symbolic link for .tmux.conf..."
-
-  if [ -f "$TMUX_CONF_TARGET" ]; then
-    # Check if it is a symbolic link and remove it before recreating.
-    if [ -L "$TMUX_CONF_TARGET" ]; then
-        rm "$TMUX_CONF_TARGET"
-    else
-        msg "warn" "A non-symlink .tmux.conf already exists. A backup will be created at $TMUX_CONF_TARGET.bak."
-        mv "$TMUX_CONF_TARGET" "$TMUX_CONF_TARGET.bak"
-    fi
-  fi
-
-  ln -sfv "$TMUX_CONF_SOURCE" "$TMUX_CONF_TARGET"
-  msg "success" "Symbolic link for .tmux.conf created."
-}
-
-
-# Install TPM (Tmux Plugin Manager) and the configured plugins.
-function install_tpm_plugins() {
-  msg "info" "Checking and installing TPM and Tmux plugins..."
-
-  # 1. Check if TPM is already cloned
-  if [ -d "$TPM_PATH" ]; then
-    msg "warn" "TPM is already installed at $TPM_PATH. Skipping clone."
-  else
-    # 2. Clone TPM if it does not exist
-    msg "info" "Cloning TPM from $TPM_REPO..."
-    if command_exists "git"; then
-      git clone "$TPM_REPO" "$TPM_PATH"
-      if [ $? -ne 0 ]; then
-        msg "error" "Failed to clone TPM. Aborting plugin installation."
-        return 1
-      fi
-      msg "success" "TPM successfully cloned."
-    else
-      msg "error" "Git is not installed. Cannot clone TPM."
-      return 1
-    fi
-  fi
-
-  # 3. Install the plugins automatically
-  if [ -f "$TPM_PATH/bin/install_plugins" ]; then
-    msg "info" "Starting automatic installation of Tmux plugins (requires tmux running)."
-    
-    # Attempt to install plugins without starting a real tmux session
-    "$TPM_PATH/bin/install_plugins"
-    
-    if [ $? -ne 0 ]; then
-      msg "error" "TPM plugin installation script failed. Ensure tmux is available."
-      return 1
-    fi
-    msg "success" "Tmux plugins installed automatically."
-  else
-    msg "error" "TPM plugin installation script not found at $TPM_PATH/bin/install_plugins."
-    return 1
-  fi
-}
+```zsh
+# Set up fzf key bindings and fuzzy completion
+source <(fzf --zsh)
 ```
 
-### 3. Integration into the `main()` of `install.sh`
-
-Call the new linking and plugin install functions in the main flow, **after** creating the symbolic link for `.tmux.conf` to ensure the config file with the plugin list is present.
-
-```bash
-# scripts/install.sh (Modification of the main function)
-
-function main() {
-  msg "info" "Starting dotfiles installation..."
-
-  # Create symbolic links
-  link_bashrc
-  # Call function to link .tmux.conf before installing plugins
-  link_tmux_conf
-
-  # Install TPM and plugins
-  if command_exists "tmux"; then
-    install_tpm_plugins
-  else
-    msg "warn" "Tmux is not installed. Skipping TPM and plugin installation."
-  fi
-  
-
-  msg "success" "Dotfiles installation completed!"
-  msg "info" "source $BASHRC_TARGET"
-  source "$BASHRC_TARGET"
-}
-
-main "$@"
-```
-
-### Summary of Automated Flow
-
-1. **`link_tmux_conf`**: Creates a symbolic link from `tmux/.tmux.conf` to `~/.tmux.conf`. This ensures your plugin list (`set-option -g @plugin '...'`) is available.
-2. **`install_tpm_plugins`**:
-
-   * Checks if `$HOME/.tmux/plugins/tpm` exists.
-   * If not, **clones the TPM repository** using `git clone`.
-   * Executes the script **`~/.tmux/plugins/tpm/bin/install_plugins`**. This script automatically reads your `~/.tmux.conf` (now linked) and clones/updates all plugins listed under `set-option -g @plugin`.
-
-## This solution is **idempotent** because it only clones TPM if it doesn't exist, and TPM’s `install_plugins` script is designed to be safe (no unnecessary reinstalls).
-
-END EXAMPLE
+Insert these lines into the appropriate shell config only after installation is validated.
 
 ---
 
-## 9. Finally, verify that all these changes are correct and fully integrated.
+# **3. Load Unified Functions File**
+
+Integrate the loading of `system/functions.zsh` into `system/.shell_config`.
+After integration:
+
+* Remove `zsh/.zsh_custom/functions.zsh`, as it is no longer needed.
 
 ---
 
-# Useful References
+# **4. Improve Default-Shell-to-Zsh Logic**
+
+Replace and enhance the current functionality that sets Zsh as the default shell.
+Use the provided example as a reference for:
+
+* idempotency
+* user notifications
+* validation
+* logging
+* fallback flows
+
+**Important:**
+You MUST maintain consistency with the existing project architecture, not simply replace the existing implementation blindly.
+
+Include the improved version of the following logic:
+
+* verifying that Zsh is installed
+* detecting the correct Zsh path
+* ensuring path exists in `/etc/shells`
+* handling fallback scenarios
+* notifying the user when logout/login is required
+
+Use the example as **inspiration**, but adapt the messages, flow, and behavior to preserve coherence with the current install script.
+
+---
+
+# **5. Unify All Symlink Creations**
+
+Create a single unified function named:
+
+```
+link_dotfiles()
+```
+
+This function must handle **all symlink creation tasks**, including the new links:
+
+1. `editors/.eslintrc.json` → user’s home directory
+2. `editors/vim/.vimrc` → user’s home directory
+3. (Include all previously existing symlinks)
+
+Ensure consistent logging, idempotency, path resolution, and error handling.
+
+---
+
+# **6. Log File Generation: Store Logs in `logs/` Directory**
+
+Modify the logging functionality to:
+
+* save all generated logs inside the `logs/` directory
+* preserve timestamped filenames
+* print messages both to console and log file
+
+Ensure that the directory is created if it does not exist.
+
+---
+
+# **7. Additional Post-Install Script**
+
+Add the following behavior to `install.sh`:
+
+* Check whether `scripts/aditionals-postinstall.sh` exists.
+
+* If it exists, ask the user:
+
+  **“Do you want to run the additional post-installation steps?”**
+
+* If the user accepts:
+
+  * Execute the script
+  * For now, the script only prints a placeholder `echo` (future expansions will be added)
+
+* If the user declines:
+
+  * Continue installation normally
+
+---
+
+# **8. Verification Function for Zsh Plugins**
+
+Create a dedicated function that verifies correct installation and functionality of:
+
+1. `zsh-autosuggestions`
+2. `zsh-syntax-highlighting`
+
+### **Requirements:**
+
+* Use **legacy-compatible POSIX commands** (no dependencies).
+* Verification should check:
+
+  * plugin presence
+  * plugin loadability
+  * absence of missing-path errors
+  * correct resolution of the expected file paths
+* Output descriptive success/error messages.
+
+---
+
+# **Additional Requirements**
+
+* Whenever “shell_config” is mentioned, it refers to:
+  **`system/.shell_config`**
+* Maintain full consistency with the existing project.
+* Ensure no duplicated definitions remain.
+* Maintain modularity, clarity, and maintainability.
+
+---
+
+# **Useful References**
 
 * [https://github.com/ohmyzsh/ohmyzsh](https://github.com/ohmyzsh/ohmyzsh)
-* [https://github.com/tmux-plugins/tpm](https://github.com/tmux-plugins/tpm)
-
----
+* [https://github.com/junegunn/fzf](https://github.com/junegunn/fzf)
+* [https://github.com/junegunn/fzf?tab=readme-ov-file#setting-up-shell-integration](https://github.com/junegunn/fzf?tab=readme-ov-file#setting-up-shell-integration)
 
