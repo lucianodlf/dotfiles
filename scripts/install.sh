@@ -22,6 +22,7 @@ readonly COLOR_CYAN='\033[0;36m'
 # Rutas del proyecto
 source "./system/.dotfile_config"
 #readonly PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/"
+readonly FONT_DIR="$HOME/.local/share/fonts"
 
 
 
@@ -228,50 +229,126 @@ function verify_zsh_plugins() {
   fi
 }
 
+# Instala Nerd Fonts para la terminal.
+function install_nerd_fonts() {
+  msg "info" "Instalando Nerd Fonts..."
+
+  if ! command_exists "curl"; then
+    msg "error" "'curl' no está instalado. No se pueden descargar las fuentes."
+    return 1
+  fi
+
+  if ! command_exists "fc-cache"; then
+    msg "warn" "'fontconfig' no parece estar instalado (no se encontró 'fc-cache'). No se podrá actualizar la caché de fuentes."
+  fi
+
+  mkdir -p "$FONT_DIR"
+
+  # URLs de las fuentes a instalar. Se ha corregido 'tree' por 'raw' para obtener el archivo real.
+  local nerd_font_urls=(
+    "https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/FiraCode/Bold/FiraCodeNerdFontMono-Bold.ttf"
+    "https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/FiraCode/Light/FiraCodeNerdFontMono-Light.ttf"
+    "https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/FiraCode/Medium/FiraCodeNerdFontMono-Medium.ttf"
+    "https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/FiraCode/Regular/FiraCodeNerdFontMono-Regular.ttf"
+    "https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/FiraCode/Retina/FiraCodeNerdFontMono-Retina.ttf"
+  )
+
+  local failed_downloads=()
+  local successful_downloads=0
+
+  for url in "${nerd_font_urls[@]}"; do
+    local font_name
+    font_name=$(basename "$url")
+    local target_file="$FONT_DIR/$font_name"
+
+    msg "info" "Descargando '$font_name'..."
+    
+    # Descargar el archivo.
+    # -f: Falla silenciosamente en errores del servidor.
+    # -L: Sigue redirecciones.
+    # -o: Especifica el archivo de salida (sobrescribe si existe).
+    curl -fLo "$target_file" "$url"
+    
+    if [ $? -ne 0 ]; then
+      failed_downloads+=("$font_name")
+      msg "error" "Falló la descarga de '$font_name'."
+    else
+      msg "success" "'$font_name' descargada en $FONT_DIR."
+      successful_downloads=$((successful_downloads + 1))
+    fi
+  done
+
+  if [ ${#failed_downloads[@]} -gt 0 ]; then
+    msg "error" "No se pudieron descargar las siguientes fuentes:"
+    for font in "${failed_downloads[@]}"; do
+      echo -e "${COLOR_RED}- ${font}${COLOR_RESET}"
+    done
+  fi
+
+  if [ "$successful_downloads" -gt 0 ] && command_exists "fc-cache"; then
+    msg "info" "Actualizando la caché de fuentes del sistema..."
+    fc-cache -f -v
+    msg "success" "Caché de fuentes actualizada."
+  fi
+  
+  if [ ${#failed_downloads[@]} -eq 0 ]; then
+    msg "success" "Todas las Nerd Fonts se instalaron correctamente."
+  fi
+}
+
+
 # ---
 # Flujo Principal
 # ---
 
 function main() {
+  # Manejo de opciones de línea de comandos.
+  # Permite ejecuciones parciales del script.
+  if [ $# -gt 0 ]; then
+    case "$1" in
+      --only-fonts)
+        # Opción exclusiva para instalar solo las fuentes y terminar.
+        install_nerd_fonts
+        return 0
+        ;;
+      *)
+        msg "error" "Opción desconocida: $1"
+        echo "Uso: $0 [--only-fonts]"
+        exit 1
+        ;;
+    esac
+  fi
+
+  # Flujo de instalación normal
   mkdir -p "$LOG_DIR"
   msg "info" "Iniciando la instalación de los dotfiles..."
-  
-    # Instalar paquetes
-    install_packages
-  
-    # Verificar fzf
-    if ! command_exists "fzf"; then
-          msg "warn" "fzf no está instalado. La integración con el shell se omitirá."
-        fi
-      
-        # Verificar plugins de Zsh
-        verify_zsh_plugins
-      
-            # Instalar Oh My Zsh
-            install_oh_my_zsh    
-          # Crear enlaces simbólicos
-          link_dotfiles
-        
-          # Configurar Git
-          configure_git
-        
-          # Enlazar .tmux.conf e instalar plugins de TPM
-          if command_exists "tmux"; then
-            install_tpm_plugins
-          else
-            msg "warn" "Tmux no está instalado. Saltando la configuración de TPM y plugins."
-          fi
-        
-          # Ejecutar script de post-instalación adicional si existe
-          if [ -f "$SCRIPTS_DIR/aditionals-postinstall.sh" ]; then
-            read -p "¿Desea ejecutar los pasos adicionales de post-instalación? (s/n): " -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Ss]$ ]]; then
-              bash "$SCRIPTS_DIR/aditionals-postinstall.sh"
-            fi
-          fi
-        
-            msg "success" "¡Instalación de dotfiles completada!"
-            msg "info" "Por favor, reinicie su shell o ejecute 'source ~/.bashrc' para aplicar los cambios."
-          }        
-        main "$@"
+
+  install_packages
+
+  if ! command_exists "fzf"; then
+    msg "warn" "'fzf' no está instalado. La integración con el shell se omitirá."
+  fi
+
+  verify_zsh_plugins
+  install_oh_my_zsh
+  link_dotfiles
+
+  if command_exists "tmux"; then
+    install_tpm_plugins
+  else
+    msg "warn" "'tmux' no está instalado. Saltando la configuración de TPM y plugins."
+  fi
+
+  if [ -f "$SCRIPTS_DIR/aditionals-postinstall.sh" ]; then
+    read -p "¿Desea ejecutar los pasos adicionales de post-instalación? (s/n): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Ss]$ ]]; then
+      bash "$SCRIPTS_DIR/aditionals-postinstall.sh"
+    fi
+  fi
+
+  msg "success" "¡Instalación de dotfiles completada!"
+  msg "info" "Por favor, reinicie su shell o ejecute 'source ~/.bashrc' o 'source ~/.zshrc' para aplicar los cambios."
+}
+
+main "$@"
