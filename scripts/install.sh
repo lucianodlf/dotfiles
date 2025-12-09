@@ -20,8 +20,9 @@ readonly COLOR_YELLOW='\033[0;33m'
 readonly COLOR_CYAN='\033[0;36m'
 
 # Rutas del proyecto
-readonly PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/.."
-source "$PROJECT_DIR/system/.dotfile_config"
+source "./system/.dotfile_config"
+#readonly PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/"
+
 
 
 # ---
@@ -141,6 +142,7 @@ function link_dotfiles() {
     "$VIMRC_SOURCE:$VIMRC_TARGET"
     "$TMUX_CONF_SOURCE:$TMUX_CONF_TARGET"
     "$INPUTRC_SOURCE:$INPUTRC_TARGET"
+    "$GITCONFIG_SOURCE:$GITCONFIG_TARGET"
   )
 
   for pair in "${source_target_pairs[@]}"; do

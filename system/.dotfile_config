@@ -68,6 +68,10 @@ export VIMRC_TARGET="$HOME/.vimrc"
 export INPUTRC_SOURCE="$PROJECT_DIR/system/.inputrc"
 export INPUTRC_TARGET="$HOME/.inputrc"
 
+# Archivos de origen y destino de .gitconfig
+export GITCONFIG_SOURCE="$PROJECT_DIR/git/.gitconfig"
+export GITCONFIG_TARGET="$HOME/.gitconfig"
+
 # Archivo de log
 export LOG_DIR="$PROJECT_DIR/logs"
 export LOG_FILE="$LOG_DIR/install-$(date +'%Y-%m-%d_%H-%M-%S').log"

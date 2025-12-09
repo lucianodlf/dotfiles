@@ -1,6 +1,6 @@
 [user]
-	name = {{GIT_AUTHOR_NAME}}
-	email = {{GIT_AUTHOR_EMAIL}}
+	name = "LucianoDlf"
+	email = "luciano.dlf@gmail.com"
 [push]
 	default = current
 [core]

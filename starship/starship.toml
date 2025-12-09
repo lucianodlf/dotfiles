@@ -41,5 +41,6 @@ format = "([$all_status$ahead_behind]($style))"
 [time]
 disabled = false
 style = "bold white"
-format = "[$time]($style) "
+#format = "[$time]($style) "
+format = "[$directory]($style) "
 time_format = "%H:%M:%S"
