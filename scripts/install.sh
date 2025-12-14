@@ -13,16 +13,16 @@
 # ---
 
 # Colores para la salida
-readonly COLOR_RESET='\033[0m'
-readonly COLOR_RED='\033[0;31m'
-readonly COLOR_GREEN='\033[0;32m'
-readonly COLOR_YELLOW='\033[0;33m'
-readonly COLOR_CYAN='\033[0;36m'
+COLOR_RESET='\033[0m'
+COLOR_RED='\033[0;31m'
+COLOR_GREEN='\033[0;32m'
+COLOR_YELLOW='\033[0;33m'
+COLOR_CYAN='\033[0;36m'
 
 # Rutas del proyecto
 source "./system/.dotfile_config"
 #readonly PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/"
-readonly FONT_DIR="$HOME/.local/share/fonts"
+FONT_DIR="$HOME/.local/share/fonts"
 
 
 
@@ -66,6 +66,40 @@ function msg() {
 # @return {number} 0 si el comando existe, 1 en caso contrario.
 function command_exists() {
   command -v "$1" >/dev/null 2>&1
+}
+
+# Muestra un mensaje y espera la entrada del usuario de forma compatible.
+# @param {string} prompt_text - El texto a mostrar al usuario.
+# La respuesta del usuario se almacena en la variable $REPLY.
+function prompt_user() {
+    local prompt_text="$1"
+    
+    if [ -n "$ZSH_VERSION" ]; then
+        # En Zsh, la sintaxis `read -p` es para coprocesos.
+        # Usamos `read "var?prompt"` para mostrar un prompt.
+        # -k 1 lee un solo caracter. -r evita que la barra invertida escape caracteres.
+        read -k 1 -r "REPLY?${prompt_text}"
+        echo # Añadir nueva línea para formato
+    else
+        # En Bash, `read -p` muestra un prompt.
+        # -n 1 lee un solo caracter.
+        read -p "$prompt_text" -n 1 -r
+        echo # Añadir nueva línea para formato
+    fi
+}
+
+# Muestra un mensaje de ayuda.
+function show_help() {
+  cat << EOF
+Uso: ./install.sh [OPCION]
+
+Script de instalación y configuración para los dotfiles.
+
+Opciones:
+  --only-fonts      Instala exclusivamente las Nerd Fonts y sale.
+  --only-nodejs     Instala/actualiza exclusivamente NVM (Node Version Manager) y Node.js, y sale.
+  --help            Muestra esta ayuda y sale.
+EOF
 }
 
 # ---
@@ -297,6 +331,125 @@ function install_nerd_fonts() {
 }
 
 
+# Instala o actualiza NVM (Node Version Manager) y opcionalmente Node.js.
+function install_nvm_and_node() {
+  msg "info" "Iniciando la instalación/actualización de NVM y Node.js..."
+
+  # Verificamos si NVM_DIR ya está en el entorno ANTES de hacer nada.
+  local nvm_dir_loaded_from_env=false
+  if [ -n "$NVM_DIR" ]; then
+    nvm_dir_loaded_from_env=true
+  fi
+
+  local nvm_installer_cmd="PROFILE=/dev/null bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash'"
+  local run_installer=false
+
+  # 1. Detectar instalación existente y preguntar para actualizar.
+  if [ -s "$HOME/.nvm/nvm.sh" ]; then
+    msg "info" "NVM ya está instalado."
+    prompt_user "¿Desea re-descargar NVM para actualizarlo? (s/n): "
+    if [[ $REPLY =~ ^[Ss]$ ]]; then
+      msg "info" "Actualizando NVM..."
+      run_installer=true
+    else
+      msg "info" "Se omitió la actualización de NVM."
+    fi
+  else
+    msg "info" "NVM no está instalado. Descargando e instalando NVM..."
+    run_installer=true
+  fi
+
+  if [ "$run_installer" = true ]; then
+    eval "$nvm_installer_cmd"
+    if [ $? -ne 0 ]; then
+      msg "error" "Falló la ejecución del script de instalación de NVM."
+      return 1
+    fi
+    msg "success" "El script de instalación de NVM se ejecutó correctamente."
+  fi
+
+  # 2. Cargar NVM en esta sesión para poder usarlo en los siguientes pasos.
+  export NVM_DIR="$HOME/.nvm"
+  if [ -s "$NVM_DIR/nvm.sh" ]; then
+    \. "$NVM_DIR/nvm.sh"
+  else
+    msg "error" "No se pudo encontrar el script nvm.sh en '$NVM_DIR'."
+    return 1
+  fi
+
+  # 3. Validar y persistir la configuración del entorno solo si no existía previamente en el entorno.
+  if [ "$nvm_dir_loaded_from_env" = true ]; then
+    msg "info" "La variable de entorno NVM_DIR ya existe. No se modificarán los archivos de configuración del shell."
+  else
+    local shell_rc_file=""
+    if [[ "$SHELL" == */zsh ]]; then
+        shell_rc_file="$HOME/.zshrc"
+    elif [[ "$SHELL" == */bash ]]; then
+        shell_rc_file="$HOME/.bashrc"
+    fi
+
+    if [ -n "$shell_rc_file" ] && [ -f "$shell_rc_file" ]; then
+      if ! grep -q 'NVM_DIR' "$shell_rc_file"; then
+        msg "warn" "La configuración de NVM no se encontró en '$shell_rc_file'."
+        
+        local nvm_config_block
+        nvm_config_block=$(cat <<'EOF'
+
+# Configuración de NVM (Node Version Manager)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+EOF
+)
+        echo "El siguiente bloque de código se añadirá a su archivo de configuración:"
+        echo -e "${COLOR_YELLOW}${nvm_config_block}${COLOR_RESET}"
+        prompt_user "The file [$shell_rc_file] will be modified to add NVM configuration. Do you want to continue? (s/n): "
+        if [[ $REPLY =~ ^[Ss]$ ]]; then
+            msg "info" "Añadiendo configuración de NVM a '$shell_rc_file'..."
+            echo "$nvm_config_block" >> "$shell_rc_file"
+            msg "success" "Configuración añadida."
+        else
+            msg "warn" "Modificación cancelada. NVM no estará disponible en nuevas terminales."
+        fi
+      else
+        msg "info" "La configuración de NVM ya existe en '$shell_rc_file'."
+      fi
+    else
+      msg "warn" "No se pudo detectar un shell compatible (Bash o Zsh) o el archivo rc no existe para configurar NVM de forma persistente."
+    fi
+  fi
+
+  # 4. Validar que NVM esté disponible como comando.
+  if ! command_exists "nvm"; then
+    msg "error" "NVM no se pudo cargar como comando. Compruebe la configuración."
+    return 1
+  fi
+  msg "success" "NVM cargado y verificado correctamente."
+  
+  # 5. Opcionalmente, instalar Node.js
+  local stable_version
+  stable_version=$(nvm version-remote stable)
+  
+  prompt_user "¿Desea instalar la versión estable de Node.js ($stable_version)? (s/n): "
+  if [[ $REPLY =~ ^[Ss]$ ]]; then
+    msg "info" "Instalando Node.js ($stable_version)..."
+    nvm install stable
+    if [ $? -eq 0 ]; then
+      msg "success" "Node.js (stable) instalado."
+      msg "info" "Versión instalada:"
+      nvm list stable
+    else
+      msg "error" "Falló la instalación de Node.js."
+      return 1
+    fi
+  else
+    msg "info" "Instalación de Node.js omitida."
+  fi
+  
+  msg "success" "Proceso de NVM y Node.js completado."
+}
+
+
 # ---
 # Flujo Principal
 # ---
@@ -306,14 +459,23 @@ function main() {
   # Permite ejecuciones parciales del script.
   if [ $# -gt 0 ]; then
     case "$1" in
+      --help)
+        show_help
+        return 0
+        ;;
       --only-fonts)
         # Opción exclusiva para instalar solo las fuentes y terminar.
         install_nerd_fonts
         return 0
         ;;
+      --only-nodejs)
+        # Opción exclusiva para instalar NVM y Node.js.
+        install_nvm_and_node
+        return 0
+        ;;
       *)
         msg "error" "Opción desconocida: $1"
-        echo "Uso: $0 [--only-fonts]"
+        show_help
         exit 1
         ;;
     esac
@@ -340,8 +502,7 @@ function main() {
   fi
 
   if [ -f "$SCRIPTS_DIR/aditionals-postinstall.sh" ]; then
-    read -p "¿Desea ejecutar los pasos adicionales de post-instalación? (s/n): " -n 1 -r
-    echo
+    prompt_user "¿Desea ejecutar los pasos adicionales de post-instalación? (s/n): "
     if [[ $REPLY =~ ^[Ss]$ ]]; then
       bash "$SCRIPTS_DIR/aditionals-postinstall.sh"
     fi
