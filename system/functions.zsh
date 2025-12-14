@@ -2,6 +2,10 @@
 
 # Funciones de shell compartidas.
 
+# Modifica barra de titulo de gnome temrinal a su version legacy
+function set_legacy_titlebar_gnomeshell() { gsettings set org.gnome.Terminal.Legacy.Settings headerbar "@mb false"; }
+
+
 # Lista los componentes del PATH, uno por línea.
 function path() { echo -e ${PATH//:/\n}; }
 
