@@ -72,3 +72,6 @@ fi
 if [ -f "$CONFIG_DIR/.shell_config" ]; then
     source "$CONFIG_DIR/.shell_config"
 fi
+
+eval "$(uv generate-shell-completion bash)"
+eval "$(uvx --generate-shell-completion bash)"
