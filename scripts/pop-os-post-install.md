@@ -1,3 +1,3 @@
 ## TMP For create script
 
-npm install -g eslint
+app-innovat/frontend on  main [!] via  v22.13.0 

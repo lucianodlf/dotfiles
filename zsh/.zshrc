@@ -90,5 +90,5 @@ fi
 if [ -f "$CONFIG_DIR/.shell_config" ]; then
     source "$CONFIG_DIR/.shell_config"
 fi
-#. "$HOME/.local/bin/env"
+
 export DISABLE_AUTO_TITLE='true'

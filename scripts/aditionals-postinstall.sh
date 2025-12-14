@@ -93,7 +93,7 @@ function install_uv() {
   curl -LsSf https://astral.sh/uv/install.sh | sh
   # Añadir uv al PATH para la sesión actual
   # La instalación de uv se realiza en $HOME/.local/bin
-  source "$HOME/.local/bin/env"
+  #source "$HOME/.local/bin/uv"
 
   if command_exists "uv"; then
     msg "success" "uv instalado correctamente."
