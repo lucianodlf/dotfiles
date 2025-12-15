@@ -1,0 +1,22 @@
+{
+  "accounts": {
+    "luciano.dlf_X7jYMn@kindle.com": [
+      "EPUB, TPZ",
+      true,
+      true
+    ]
+  },
+  "aliases": {
+    "luciano.dlf@gmail.com": "luciano"
+  },
+  "encryption": "TLS",
+  "from_": "luciano.dlf@gmail.com",
+  "relay_host": null,
+  "relay_password": "",
+  "relay_port": 25,
+  "relay_username": null,
+  "subjects": {
+    "luciano.dlf@gmail.com": ""
+  },
+  "tags": {}
+}

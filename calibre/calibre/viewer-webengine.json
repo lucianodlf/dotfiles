@@ -1,0 +1,209 @@
+{
+  "geometry-of-main_window_geometry": {
+    "frame_geometry": {
+      "height": 758,
+      "width": 857,
+      "x": 0,
+      "y": 0
+    },
+    "full_screened": false,
+    "geometry": {
+      "height": 720,
+      "width": 853,
+      "x": 2,
+      "y": 36
+    },
+    "maximized": false,
+    "normal_geometry": {
+      "height": 720,
+      "width": 853,
+      "x": 2,
+      "y": 36
+    },
+    "qt": {
+      "__class__": "bytearray",
+      "__value__": "AdnQywADAAAAAAAAAAAAAAAAA1gAAAL1AAAAAgAAACQAAANWAAAC8wAAAAEAAAAACgAAAAACAAAAJAAAA1YAAALz"
+    },
+    "screen": {
+      "depth": 24,
+      "device_pixel_ratio": 1.0,
+      "geometry_in_logical_pixels": {
+        "height": 1080,
+        "width": 2560,
+        "x": 0,
+        "y": 0
+      },
+      "index_in_screens_list": 1,
+      "manufacturer": "LG Electronics",
+      "model": "LG ULTRAWIDE",
+      "name": "HDMI-1-0",
+      "serial": "267457",
+      "size_in_logical_pixels": {
+        "height": 1080,
+        "width": 2560
+      },
+      "virtual_geometry": {
+        "height": 1080,
+        "width": 4480,
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  "main_window_state": {
+    "__class__": "bytearray",
+    "__value__": "AAAA/wAAAAH9AAAAAgAAAAAAAAEAAAAC0PwCAAAAAvsAAAAQAHQAbwBjAC0AZABvAGMAawAAAAAAAAAC0AAAAIUA////+wAAABYAcwBlAGEAcgBjAGgALQBkAG8AYwBrAAAAAAD/////AAAAkwD///8AAAABAAAAAAAAAAD8AgAAAAT7AAAAFgBsAG8AbwBrAHUAcAAtAGQAbwBjAGsAAAAAAP////8AAAB6AP////sAAAAcAGIAbwBvAGsAbQBhAHIAawBzAC0AZABvAGMAawAAAAAA/////wAAAOUA////+wAAABwAaQBuAHMAcABlAGMAdABvAHIALQBkAG8AYwBrAAAAAAD/////AAAAEQD////7AAAAHgBoAGkAZwBoAGwAaQBnAGgAdABzAC0AZABvAGMAawAAAAAA/////wAAAM4A////AAADVQAAAtAAAAAEAAAABAAAAAgAAAAI/AAAAAEAAAAAAAAAAQAAAB4AYQBjAHQAaQBvAG4AcwBfAHQAbwBvAGwAYgBhAHICAAAAAP////8AAAAAAAAAAA=="
+  },
+  "old_prefs_migrated": true,
+  "session_data": {
+    "controls_help_shown_count": 2,
+    "standalone_font_settings": {},
+    "standalone_misc_settings": {
+      "remember_last_read": true,
+      "remember_window_geometry": false,
+      "save_annotations_in_ebook": true,
+      "singleinstance": false
+    },
+    "standalone_recently_opened": [
+      {
+        "authors": [
+          "Carl Gustav Jung"
+        ],
+        "key": "/home/rafiki/Biblioteca-Calibre/Carl Gustav Jung/El Libro rojo (124)/El Libro rojo - Carl Gustav Jung.epub",
+        "pathtoebook": "/home/rafiki/Biblioteca-Calibre/Carl Gustav Jung/El Libro rojo (124)/El Libro rojo - Carl Gustav Jung.epub",
+        "timestamp": "2025-07-29T02:34:44.937Z",
+        "title": "El Libro rojo"
+      },
+      {
+        "authors": [
+          "El libro rojo [ocr] [2012]"
+        ],
+        "key": "/home/rafiki/Descargas/Jung, Carl Gustav. - El libro rojo [ocr] [2012].epub",
+        "pathtoebook": "/home/rafiki/Descargas/Jung, Carl Gustav. - El libro rojo [ocr] [2012].epub",
+        "timestamp": "2025-07-29T02:30:46.048Z",
+        "title": "Jung, Carl Gustav."
+      },
+      {
+        "key": "/home/rafiki/Descargas/MAS_QUE_HUMANO_THEODORE_STURGEON.epub",
+        "pathtoebook": "/home/rafiki/Descargas/MAS_QUE_HUMANO_THEODORE_STURGEON.epub",
+        "timestamp": "2025-07-29T02:28:49.263Z",
+        "title": "MAS QUE HUMANO THEODORE STURGEON"
+      },
+      {
+        "authors": [
+          "Arkadi Strugatsky"
+        ],
+        "key": "/home/rafiki/Descargas/Qué difícil es ser Dios -- Strugatsky, Arkadi -- 1963 -- b131b2bdd21066051c94f0e108e786a3 -- Anna’s Archive.epub",
+        "pathtoebook": "/home/rafiki/Descargas/Qué difícil es ser Dios -- Strugatsky, Arkadi -- 1963 -- b131b2bdd21066051c94f0e108e786a3 -- Anna’s Archive.epub",
+        "timestamp": "2025-07-24T16:33:02.576Z",
+        "title": "Qué difícil es ser Dios"
+      },
+      {
+        "authors": [
+          "Isaac Asimov"
+        ],
+        "key": "/home/rafiki/Biblioteca-Calibre/Isaac Asimov/Asimov_ Cuentos completos (112)/Asimov_ Cuentos completos - Isaac Asimov.epub",
+        "pathtoebook": "/home/rafiki/Biblioteca-Calibre/Isaac Asimov/Asimov_ Cuentos completos (112)/Asimov_ Cuentos completos - Isaac Asimov.epub",
+        "timestamp": "2025-07-10T00:09:59.274Z",
+        "title": "Asimov: Cuentos completos"
+      },
+      {
+        "authors": [
+          "Isaac Asimov"
+        ],
+        "key": "/home/rafiki/Descargas/Trilogía de la fundación by Isaac Asimov (z-lib.org).epub",
+        "pathtoebook": "/home/rafiki/Descargas/Trilogía de la fundación by Isaac Asimov (z-lib.org).epub",
+        "timestamp": "2025-07-10T00:08:31.558Z",
+        "title": "Trilogía de la fundación"
+      },
+      {
+        "authors": [
+          "Isaac Asimov"
+        ],
+        "key": "/home/rafiki/Descargas/El Imperio Romano - Isaac Asimov.epub",
+        "pathtoebook": "/home/rafiki/Descargas/El Imperio Romano - Isaac Asimov.epub",
+        "timestamp": "2025-07-10T00:08:10.812Z",
+        "title": "El Imperio Romano"
+      },
+      {
+        "authors": [
+          "Isaac Asimov"
+        ],
+        "key": "/home/rafiki/Descargas/Asimov_ Cuentos completos -- Isaac Asimov -- Asimov_ Cuentos completos, 1990 -- ePubLibre -- 242f044b49a9622da2a4c5dfc0eb9b22 -- Anna’s Archive.epub",
+        "pathtoebook": "/home/rafiki/Descargas/Asimov_ Cuentos completos -- Isaac Asimov -- Asimov_ Cuentos completos, 1990 -- ePubLibre -- 242f044b49a9622da2a4c5dfc0eb9b22 -- Anna’s Archive.epub",
+        "timestamp": "2025-07-10T00:07:28.538Z",
+        "title": "Asimov: Cuentos completos"
+      },
+      {
+        "authors": [
+          "Isaac Asimov"
+        ],
+        "key": "/home/rafiki/Descargas/El Imperio Romano -- Asimov, Isaac -- Historia universal Asimov 6, 1966 -- Alianza Editorial, S_ A_ -- 9b284373d51e61bda5fe317d6c6aabde -- Anna’s Archive.epub",
+        "pathtoebook": "/home/rafiki/Descargas/El Imperio Romano -- Asimov, Isaac -- Historia universal Asimov 6, 1966 -- Alianza Editorial, S_ A_ -- 9b284373d51e61bda5fe317d6c6aabde -- Anna’s Archive.epub",
+        "timestamp": "2025-07-10T00:04:05.587Z",
+        "title": "El Imperio Romano"
+      },
+      {
+        "authors": [
+          "Lu Gaitán"
+        ],
+        "key": "/home/rafiki/Biblioteca-Calibre/Lu Gaitan/Astrologia para reencantar el mundo (Fuera de coleccion) (Spanish Edition) (54)/Astrologia para reencantar el mundo (Fuera - Lu Gaitan.mobi",
+        "pathtoebook": "/home/rafiki/Biblioteca-Calibre/Lu Gaitan/Astrologia para reencantar el mundo (Fuera de coleccion) (Spanish Edition) (54)/Astrologia para reencantar el mundo (Fuera - Lu Gaitan.mobi",
+        "timestamp": "2025-07-08T22:07:18.819Z",
+        "title": "Astrología para reencantar el mundo (Fuera de colección) (Spanish Edition)"
+      },
+      {
+        "authors": [
+          "Arthur C. Clarke",
+          "Paul Preuss"
+        ],
+        "key": "/home/rafiki/Descargas/El encuentro con Medusa -- Arthur C_ Clarke & Paul Preuss -- 1990 -- ePubLibre -- fd483861ec6fe14942b067aaf31490fd -- Anna’s Archive.mobi",
+        "pathtoebook": "/home/rafiki/Descargas/El encuentro con Medusa -- Arthur C_ Clarke & Paul Preuss -- 1990 -- ePubLibre -- fd483861ec6fe14942b067aaf31490fd -- Anna’s Archive.mobi",
+        "timestamp": "2025-07-07T21:38:11.342Z",
+        "title": "El encuentro con Medusa"
+      },
+      {
+        "authors": [
+          "Frank Herbert"
+        ],
+        "key": "/home/rafiki/Descargas/Dune -- Frank Herbert -- Dune 1, 1964 -- 13b005efcbe0477deb40d15c58d9d9bc -- Anna’s Archive.epub",
+        "pathtoebook": "/home/rafiki/Descargas/Dune -- Frank Herbert -- Dune 1, 1964 -- 13b005efcbe0477deb40d15c58d9d9bc -- Anna’s Archive.epub",
+        "timestamp": "2025-07-07T21:37:07.905Z",
+        "title": "Dune"
+      },
+      {
+        "key": "/home/rafiki/Descargas/Luciano/El_libro_de_la_Sabiduria_Español_Harry_B_Joseph.epub",
+        "pathtoebook": "/home/rafiki/Descargas/Luciano/El_libro_de_la_Sabiduria_Español_Harry_B_Joseph.epub",
+        "timestamp": "2025-07-02T23:15:48.872Z",
+        "title": "El Libro De La Sabiduria Español Harry B Joseph"
+      },
+      {
+        "authors": [
+          "Alice A. Bailey"
+        ],
+        "key": "/home/rafiki/Biblioteca-Calibre/Alice A. Bailey/Astrologia Esoterica (Tratado Sobre Los Siete Rayos Tomo 3) (80)/Astrologia Esoterica (Tratado Sobre Los Si - Alice A. Bailey.epub",
+        "pathtoebook": "/home/rafiki/Biblioteca-Calibre/Alice A. Bailey/Astrologia Esoterica (Tratado Sobre Los Siete Rayos Tomo 3) (80)/Astrologia Esoterica (Tratado Sobre Los Si - Alice A. Bailey.epub",
+        "timestamp": "2025-05-26T17:01:26.506Z",
+        "title": "Astrologia Esoterica (Tratado Sobre Los Siete Rayos Tomo 3)"
+      },
+      {
+        "authors": [
+          "Alice Bailey"
+        ],
+        "key": "/home/rafiki/Biblioteca-Calibre/Alice Bailey/LA LUZ DEL ALMA_ SU CIENCIA Y EFECTO. Parafrasis De Los Aforismos Del Yoga De PATANJALI (81)/LA LUZ DEL ALMA_ SU CIENCIA Y EFECTO. Para - Alice Bailey.epub",
+        "pathtoebook": "/home/rafiki/Biblioteca-Calibre/Alice Bailey/LA LUZ DEL ALMA_ SU CIENCIA Y EFECTO. Parafrasis De Los Aforismos Del Yoga De PATANJALI (81)/LA LUZ DEL ALMA_ SU CIENCIA Y EFECTO. Para - Alice Bailey.epub",
+        "timestamp": "2025-05-16T15:32:22.952Z",
+        "title": "La luz del alma"
+      },
+      {
+        "authors": [
+          "Gabriel García Márquez"
+        ],
+        "key": "/home/rafiki/Biblioteca-Calibre/Gabriel Garcia Marquez/Cien anos de soledad (52)/Cien anos de soledad - Gabriel Garcia Marquez.epub",
+        "pathtoebook": "/home/rafiki/Biblioteca-Calibre/Gabriel Garcia Marquez/Cien anos de soledad (52)/Cien anos de soledad - Gabriel Garcia Marquez.epub",
+        "timestamp": "2025-02-28T17:47:56.802Z",
+        "title": "Cien años de soledad (Edición conmemorativa)"
+      }
+    ]
+  }
+}

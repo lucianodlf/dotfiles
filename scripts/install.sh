@@ -535,6 +535,7 @@ function install_calibre() {
   # 1. Comprobar si Calibre ya está instalado.
   if command_exists "calibre"; then
     msg "warn" "Calibre ya está instalado en '$(command -v calibre)'. Saltando la instalación."
+    link_config_calibre
     return 0
   fi
 
@@ -566,9 +567,20 @@ function install_calibre() {
   # La ruta de instalación por defecto del script es /opt/calibre/calibre, con un enlace simbólico en /usr/bin/calibre
   if command_exists "calibre"; then
     msg "success" "Calibre se ha instalado correctamente en '$(command -v calibre)'."
+    link_config_calibre
   else
     msg "error" "La instalación de Calibre parece haber fallado, no se encontró el comando 'calibre' en el PATH."
     return 1
+  fi
+}
+
+function link_config_calibre() {
+  prompt_user "¿Desea crear enlace simbolico de la configuracion en '$CALIBRE_TARGET' (s/n): "
+  if [[ $REPLY =~ ^[Ss]$ ]]; then
+    msg "info" "Creacion de enlace simbolico de calibre..."
+    ln -svf "$CALIBRE_SOURCE" "$CALIBRE_TARGET"
+  else
+    msg "info" "Se omitió crear enlace simbolico de configuracion de calibre"
   fi
 }
 

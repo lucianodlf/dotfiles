@@ -75,3 +75,7 @@ export GITCONFIG_TARGET="$HOME/.gitconfig"
 # Archivo de log
 export LOG_DIR="$PROJECT_DIR/logs"
 export LOG_FILE="$LOG_DIR/install-$(date +'%Y-%m-%d_%H-%M-%S').log"
+
+# Archivos de origen y destino de config calibre
+export CALIBRE_SOURCE="$PROJECT_DIR/calibre/calibre"
+export CALIBRE_TARGET="$HOME/.config/"
