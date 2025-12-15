@@ -93,3 +93,8 @@ Ideas e insipiraciónes:
 ## Info adicional (no integrados)
 - Para GNOME (Lenovo Battery Threshold): https://extensions.gnome.org/extension/4798/thinkpad-battery-threshold/
 
+### Lector de huellas (Lenovo)
+- sudo fwupdmgr update
+- sudo apt update && sudo apt install fprintd libpam-fprintd
+- sudo pam-auth-update
+
