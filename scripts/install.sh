@@ -101,6 +101,7 @@ Opciones:
   --only-dbeaver    Instala exclusivamente DBeaver y sale.
   --only-pyenv      Instala exclusivamente Pyenv y sale.
   --only-calibre    Instala exclusivamente Calibre y sale.
+  --only-sshserver  Instala y configura OpenSSH Server y sale.
   --help            Muestra esta ayuda y sale.
 EOF
 }
@@ -746,6 +747,132 @@ EOF
     fi
   }
   
+# Instala y configura OpenSSH Server.
+function install_ssh_server() {
+  msg "info" "⚙️  Iniciando la configuración de OpenSSH Server..."
+
+  # 1. Verificar si SSH Server ya está instalado
+  if command -v sshd >/dev/null 2>&1; then
+    msg "success" "OpenSSH Server ya está instalado."
+  else
+    msg "info" "OpenSSH Server no está instalado. Procediendo con la instalación..."
+    prompt_user "Se instalará 'openssh-server'. Esto requiere privilegios de administrador (sudo). ¿Desea continuar? (s/n): "
+    if [[ ! $REPLY =~ ^[Ss]$ ]]; then
+      msg "warn" "Instalación de OpenSSH Server cancelada por el usuario."
+      return 1
+    fi
+
+    # Instalar OpenSSH Server
+    if ! sudo apt-get update -qq || ! sudo apt-get install -y openssh-server; then
+      msg "error" "Falló la instalación de OpenSSH Server. Por favor, revise los errores."
+      return 1
+    fi
+    msg "success" "✅ OpenSSH Server instalado correctamente."
+  fi
+
+  # 2. Verificar el estado del servicio SSH
+  msg "info" "Verificando el estado del servicio SSH..."
+  if systemctl is-active --quiet ssh; then
+    msg "success" "El servicio SSH está activo y en ejecución."
+  else
+    msg "warn" "El servicio SSH no está en ejecución. Intentando iniciarlo..."
+    if ! sudo systemctl start ssh; then
+      msg "error" "No se pudo iniciar el servicio SSH. Compruebe el estado con 'systemctl status ssh'."
+      return 1
+    fi
+    # Re-verificar
+    if systemctl is-active --quiet ssh; then
+      msg "success" "✅ El servicio SSH se ha iniciado correctamente."
+    else
+      msg "error" "A pesar del intento, el servicio SSH no se está ejecutando. Abortando."
+      return 1
+    fi
+  fi
+
+  # 3. Configuración opcional del firewall (UFW)
+  configure_ufw_for_ssh
+  
+  msg "success" "🎉 Configuración de OpenSSH Server completada."
+}
+
+# Configura el firewall UFW para permitir conexiones SSH.
+function configure_ufw_for_ssh() {
+  if ! command -v ufw >/dev/null 2>&1; then
+    msg "warn" "El comando 'ufw' no está disponible. Saltando la configuración del firewall."
+    return 0
+  fi
+  
+  prompt_user "¿Desea configurar el firewall (UFW) para permitir conexiones SSH? (s/n): "
+  if [[ ! $REPLY =~ ^[Ss]$ ]]; then
+    msg "info" "Configuración del firewall omitida."
+    return 0
+  fi
+
+  msg "info" "Seleccione una opción para configurar UFW:"
+  echo "  1) Permitir SSH desde cualquier IP"
+  echo "  2) Permitir SSH desde una IP específica"
+  echo "  3) Permitir SSH desde un segmento de red (CIDR)"
+  echo "  *) Cancelar"
+  
+  local ufw_choice
+  if [ -n "$ZSH_VERSION" ]; then
+    read "ufw_choice?Opción: "
+  else
+    read -p "Opción: " ufw_choice
+  fi
+
+  local port
+  local ip_address
+  local network_segment
+
+  case "$ufw_choice" in
+    1)
+      if [ -n "$ZSH_VERSION" ]; then
+        read "port?Introduzca el puerto para SSH (ej. 22): "
+      else
+        read -p "Introduzca el puerto para SSH (ej. 22): " port
+      fi
+      msg "info" "Ejecutando: sudo ufw allow $port/tcp"
+      sudo ufw allow "$port/tcp"
+      ;;
+    2)
+      if [ -n "$ZSH_VERSION" ]; then
+        read "ip_address?Introduzca la dirección IP (ej. 192.168.1.100): "
+        read "port?Introduzca el puerto para SSH (ej. 22): "
+      else
+        read -p "Introduzca la dirección IP (ej. 192.168.1.100): " ip_address
+        read -p "Introduzca el puerto para SSH (ej. 22): " port
+      fi
+      msg "info" "Ejecutando: sudo ufw allow from $ip_address to any port $port"
+      sudo ufw allow from "$ip_address" to any port "$port"
+      ;;
+    3)
+      if [ -n "$ZSH_VERSION" ]; then
+        read "network_segment?Introduzca el segmento de red (ej. 192.168.1.0/24): "
+        read "port?Introduzca el puerto para SSH (ej. 22): "
+      else
+        read -p "Introduzca el segmento de red (ej. 192.168.1.0/24): " network_segment
+        read -p "Introduzca el puerto para SSH (ej. 22): " port
+      fi
+      msg "info" "Ejecutando: sudo ufw allow from $network_segment to any port $port"
+      sudo ufw allow from "$network_segment" to any port "$port"
+      ;;
+    *)
+      msg "warn" "Operación cancelada. No se han aplicado reglas de firewall."
+      return 0
+      ;;
+  esac
+
+  # Verificar estado de UFW y activarlo si es necesario
+  if ! sudo ufw status | grep -q "Status: active"; then
+    msg "warn" "UFW está inactivo. Se procederá a activarlo."
+    echo "y" | sudo ufw enable
+  fi
+  
+  msg "info" "Estado final del firewall:"
+  sudo ufw status verbose
+  msg "success" "✅ Reglas de UFW aplicadas y firewall activado."
+}
   
   # ---
   # Flujo Principal
@@ -783,6 +910,11 @@ EOF
         --only-calibre)
           # Opción exclusiva para instalar Calibre.
           install_calibre
+          return 0
+          ;;
+        --only-sshserver)
+          # Opción exclusiva para instalar y configurar OpenSSH Server.
+          install_ssh_server
           return 0
           ;;
         *)
@@ -823,6 +955,12 @@ EOF
     # Paso final de validación: Clave SSH
     check_and_create_ssh_key
   
+    # Opcional: Instalar y configurar SSH Server
+    prompt_user "¿Desea instalar y configurar OpenSSH Server? (s/n): "
+    if [[ $REPLY =~ ^[Ss]$ ]]; then
+        install_ssh_server
+    fi
+
     msg "success" "¡Instalación de dotfiles completada!"
     msg "info" "Por favor, reinicie su shell o ejecute 'source ~/.bashrc' o 'source ~/.zshrc' para aplicar los cambios."
   }
