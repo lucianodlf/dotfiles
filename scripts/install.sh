@@ -98,6 +98,9 @@ Script de instalación y configuración para los dotfiles.
 Opciones:
   --only-fonts      Instala exclusivamente las Nerd Fonts y sale.
   --only-nodejs     Instala/actualiza exclusivamente NVM (Node Version Manager) y Node.js, y sale.
+  --only-dbeaver    Instala exclusivamente DBeaver y sale.
+  --only-pyenv      Instala exclusivamente Pyenv y sale.
+  --only-calibre    Instala exclusivamente Calibre y sale.
   --help            Muestra esta ayuda y sale.
 EOF
 }
@@ -331,6 +334,244 @@ function install_nerd_fonts() {
 }
 
 
+# Instala DBeaver Community Edition.
+function install_dbeaver() {
+  msg "info" "Iniciando la instalación de DBeaver..."
+  
+  local tmp_dir
+  tmp_dir=$(mktemp -d)
+  
+  local dbeaver_url="https://dbeaver.io/files/dbeaver-ce_latest_amd64.deb"
+  local downloaded_file_path
+  
+  msg "info" "Descargando el paquete DBeaver..."
+  if ! curl -L -J -o "$tmp_dir/dbeaver-ce_latest_amd64.deb" "$dbeaver_url"; then
+    msg "error" "No se pudo descargar el paquete de DBeaver."
+    rm -rf "$tmp_dir"
+    return 1
+  fi
+  
+  # Encontrar el nombre real del archivo descargado
+  local downloaded_file
+  downloaded_file=$(find "$tmp_dir" -name "dbeaver-ce_*.deb")
+  
+  if [ -z "$downloaded_file" ]; then
+    msg "error" "No se encontró el archivo .deb de DBeaver descargado."
+    rm -rf "$tmp_dir"
+    return 1
+  fi
+  
+  local file_name
+  file_name=$(basename "$downloaded_file")
+  msg "success" "Paquete '$file_name' descargado."
+  
+  # Extraer la versión del nombre del archivo
+  local version
+  version=$(echo "$file_name" | sed -n 's/dbeaver-ce_\(.*\)_amd64\.deb/\1/p')
+  
+  if [ -z "$version" ]; then
+    msg "error" "No se pudo extraer la versión del nombre del archivo: $file_name"
+    rm -rf "$tmp_dir"
+    return 1
+  fi
+  msg "info" "Versión detectada: $version"
+  
+  # Descargar el checksum
+  local checksum_url="https://dbeaver.io/files/${version}/checksum/${file_name}.sha256"
+  local checksum_file="$tmp_dir/${file_name}.sha256"
+  
+  msg "info" "Descargando el archivo de checksum..."
+  if ! curl -L -f -o "$checksum_file" "$checksum_url"; then
+    msg "error" "No se pudo descargar el archivo de checksum desde $checksum_url."
+    rm -rf "$tmp_dir"
+    return 1
+  fi
+  
+  # Verificar el checksum
+  msg "info" "Verificando el checksum del archivo..."
+  local expected_checksum
+  expected_checksum=$(cat "$checksum_file")
+  local calculated_checksum
+  calculated_checksum=$(sha256sum "$downloaded_file" | awk '{print $1}')
+  
+  if [ "$calculated_checksum" != "$expected_checksum" ]; then
+    msg "error" "❌ El checksum no coincide. Abortando la instalación."
+    msg "error" "Calculado: $calculated_checksum"
+    msg "error" "Esperado:  $expected_checksum"
+    rm -rf "$tmp_dir"
+    return 1
+  fi
+  
+  msg "success" "✅ Checksum válido."
+  
+  # Instalar el paquete
+  msg "info" "Instalando DBeaver... Se requerirá su contraseña (sudo)."
+  if ! sudo dpkg --install "$downloaded_file"; then
+    msg "error" "Falló la instalación de DBeaver con dpkg. Intentando resolver dependencias..."
+    # Si dpkg falla, a menudo es por dependencias. `apt-get -f install` puede solucionarlo.
+    if ! sudo apt-get -f install -y; then
+      msg "error" "No se pudieron resolver las dependencias de DBeaver. Abortando."
+      rm -rf "$tmp_dir"
+      return 1
+    fi
+  fi
+  
+  msg "success" "DBeaver instalado correctamente."
+  
+  # Limpieza
+  rm -rf "$tmp_dir"
+}
+
+# Instala Pyenv.
+function install_pyenv() {
+  msg "info" "Iniciando la instalación/actualización de Pyenv..."
+
+  # Variables
+  local pyenv_root="$HOME/.pyenv"
+  local run_installer=false
+
+  # 1. Detectar instalación existente y preguntar para actualizar.
+  if [ -d "$pyenv_root" ]; then
+    msg "info" "Pyenv parece estar instalado en '$pyenv_root'."
+    prompt_user "¿Desea re-descargar y actualizar Pyenv? (s/n): "
+    if [[ $REPLY =~ ^[Ss]$ ]]; then
+      msg "info" "Actualizando Pyenv..."
+      run_installer=true
+    else
+      msg "info" "Se omitió la actualización de Pyenv."
+    fi
+  else
+    msg "info" "Pyenv no está instalado. Descargando e instalando Pyenv..."
+    run_installer=true
+  fi
+
+  # 2. Ejecutar el instalador si es necesario.
+  if [ "$run_installer" = true ]; then
+    # El instalador oficial de pyenv
+    if ! curl -fsSL https://pyenv.run | bash; then
+      msg "error" "Falló la ejecución del script de instalación de Pyenv."
+      return 1
+    fi
+    msg "success" "El script de instalación de Pyenv se ejecutó correctamente."
+  fi
+
+  # 3. Validar la instalación después de ejecutar el script.
+  if [ ! -d "$pyenv_root" ] || [ ! -x "$pyenv_root/bin/pyenv" ]; then
+    msg "error" "La instalación de Pyenv falló. No se encontró en '$pyenv_root'."
+    return 1
+  fi
+  msg "success" "Pyenv verificado en '$pyenv_root'."
+
+  # 4. Persistir la configuración del entorno si es necesario.
+  # Comprobamos si PYENV_ROOT ya está cargado en el entorno actual.
+  if [ -n "$PYENV_ROOT" ]; then
+    msg "info" "La variable de entorno PYENV_ROOT ya existe. No se modificarán los archivos de configuración del shell."
+  else
+    local shell_rc_file=""
+    local shell_type=""
+    if [[ "$SHELL" == */zsh ]]; then
+        shell_rc_file="$HOME/.zshrc"
+        shell_type="zsh"
+    elif [[ "$SHELL" == */bash ]]; then
+        shell_rc_file="$HOME/.bashrc"
+        shell_type="bash"
+    fi
+
+    if [ -n "$shell_rc_file" ] && [ -f "$shell_rc_file" ]; then
+      # Comprobar si la configuración ya está en el archivo.
+      if ! grep -q 'PYENV_ROOT' "$shell_rc_file"; then
+        msg "warn" "La configuración de Pyenv no se encontró en '$shell_rc_file'."
+        
+        local pyenv_config_block=""
+        if [ "$shell_type" = "zsh" ]; then
+          pyenv_config_block=$(cat <<'EOF'
+
+# Configuración de Pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+if [ -d "$PYENV_ROOT/bin" ]; then
+  export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init - zsh)"
+fi
+EOF
+)
+        elif [ "$shell_type" = "bash" ]; then
+          pyenv_config_block=$(cat <<'EOF'
+
+# Configuración de Pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+if [ -d "$PYENV_ROOT/bin" ]; then
+  export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init - bash)"
+fi
+EOF
+)
+        fi
+
+        echo "El siguiente bloque de código se añadirá a su archivo de configuración:"
+        echo -e "${COLOR_YELLOW}${pyenv_config_block}${COLOR_RESET}"
+        prompt_user "El archivo [$shell_rc_file] será modificado para añadir la configuración de Pyenv. ¿Desea continuar? (s/n): "
+        if [[ $REPLY =~ ^[Ss]$ ]]; then
+            msg "info" "Añadiendo configuración de Pyenv a '$shell_rc_file'..."
+            echo "$pyenv_config_block" >> "$shell_rc_file"
+            msg "success" "Configuración añadida. Reinicie su shell para que los cambios surtan efecto."
+        else
+            msg "warn" "Modificación cancelada. Pyenv no estará disponible en nuevas terminales."
+        fi
+      else
+        msg "info" "La configuración de Pyenv ya existe en '$shell_rc_file'."
+      fi
+    else
+      msg "warn" "No se pudo detectar un shell compatible (Bash o Zsh) o el archivo rc no existe para configurar Pyenv de forma persistente."
+    fi
+  fi
+  
+  msg "success" "Proceso de Pyenv completado."
+}
+
+# Instala Calibre.
+function install_calibre() {
+  msg "info" "Iniciando la instalación de Calibre..."
+
+  # 1. Comprobar si Calibre ya está instalado.
+  if command_exists "calibre"; then
+    msg "warn" "Calibre ya está instalado en '$(command -v calibre)'. Saltando la instalación."
+    return 0
+  fi
+
+  # 2. Verificar la dependencia libxcb-cursor.so.0.
+  # ldconfig -p es una forma de comprobarlo. `find` en directorios de librerías es otra.
+  if ! ldconfig -p | grep -q "libxcb-cursor.so.0"; then
+    msg "info" "La librería 'libxcb-cursor.so.0' no se encontró. Intentando instalar 'libxcb-cursor0'..."
+    if ! sudo apt-get install -y libxcb-cursor0; then
+      msg "error" "No se pudo instalar 'libxcb-cursor0'. La instalación de Calibre podría fallar."
+      # Decidimos continuar de todas formas, pero advertimos al usuario.
+    else
+      msg "success" "'libxcb-cursor0' instalado correctamente."
+    fi
+  else
+    msg "info" "La dependencia 'libxcb-cursor.so.0' ya está presente."
+  fi
+
+  # 3. Instalar Calibre usando el comando oficial.
+  msg "info" "Descargando e instalando Calibre... Esto puede tardar unos minutos y requerirá su contraseña (sudo)."
+  # sudo -v: actualiza el timestamp de sudo para que no pida la contraseña de inmediato.
+  # wget -nv -O-: descarga el script sin ser verboso y lo envía a stdout.
+  # sudo sh /dev/stdin: ejecuta el script recibido por stdin con privilegios de superusuario.
+  if ! (sudo -v && wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo sh /dev/stdin); then
+    msg "error" "El script de instalación de Calibre falló."
+    return 1
+  fi
+
+  # 4. Verificar la instalación.
+  # La ruta de instalación por defecto del script es /opt/calibre/calibre, con un enlace simbólico en /usr/bin/calibre
+  if command_exists "calibre"; then
+    msg "success" "Calibre se ha instalado correctamente en '$(command -v calibre)'."
+  else
+    msg "error" "La instalación de Calibre parece haber fallado, no se encontró el comando 'calibre' en el PATH."
+    return 1
+  fi
+}
+
 # Instala o actualiza NVM (Node Version Manager) y opcionalmente Node.js.
 function install_nvm_and_node() {
   msg "info" "Iniciando la instalación/actualización de NVM y Node.js..."
@@ -446,70 +687,131 @@ EOF
     msg "info" "Instalación de Node.js omitida."
   fi
   
-  msg "success" "Proceso de NVM y Node.js completado."
-}
-
-
-# ---
-# Flujo Principal
-# ---
-
-function main() {
-  # Manejo de opciones de línea de comandos.
-  # Permite ejecuciones parciales del script.
-  if [ $# -gt 0 ]; then
-    case "$1" in
-      --help)
-        show_help
-        return 0
-        ;;
-      --only-fonts)
-        # Opción exclusiva para instalar solo las fuentes y terminar.
-        install_nerd_fonts
-        return 0
-        ;;
-      --only-nodejs)
-        # Opción exclusiva para instalar NVM y Node.js.
-        install_nvm_and_node
-        return 0
-        ;;
-      *)
-        msg "error" "Opción desconocida: $1"
-        show_help
-        exit 1
-        ;;
-    esac
-  fi
-
-  # Flujo de instalación normal
-  mkdir -p "$LOG_DIR"
-  msg "info" "Iniciando la instalación de los dotfiles..."
-
-  install_packages
-
-  if ! command_exists "fzf"; then
-    msg "warn" "'fzf' no está instalado. La integración con el shell se omitirá."
-  fi
-
-  verify_zsh_plugins
-  install_oh_my_zsh
-  link_dotfiles
-
-  if command_exists "tmux"; then
-    install_tpm_plugins
-  else
-    msg "warn" "'tmux' no está instalado. Saltando la configuración de TPM y plugins."
-  fi
-
-  if [ -f "$SCRIPTS_DIR/aditionals-postinstall.sh" ]; then
-    prompt_user "¿Desea ejecutar los pasos adicionales de post-instalación? (s/n): "
-    if [[ $REPLY =~ ^[Ss]$ ]]; then
-      bash "$SCRIPTS_DIR/aditionals-postinstall.sh"
+    msg "success" "Proceso de NVM y Node.js completado."
+  }
+  
+  
+  # Valida y/o crea una clave SSH para el usuario.
+  function check_and_create_ssh_key() {
+    msg "info" "Verificando la existencia de una clave SSH pública..."
+  
+    local ssh_dir="$HOME/.ssh"
+    # `find` es más robusto que `ls` para esto
+    local pub_keys
+    pub_keys=$(find "$ssh_dir" -name "*.pub" 2>/dev/null)
+  
+    if [ -n "$pub_keys" ]; then
+      msg "success" "Se encontraron las siguientes claves SSH públicas:"
+      # `xargs basename` para limpiar la salida
+      echo "$pub_keys" | xargs -n 1 basename
+      return 0
     fi
-  fi
-
-  msg "success" "¡Instalación de dotfiles completada!"
-  msg "info" "Por favor, reinicie su shell o ejecute 'source ~/.bashrc' o 'source ~/.zshrc' para aplicar los cambios."
-}
-
+  
+    msg "warn" "No se encontró ninguna clave SSH pública en '$ssh_dir'."
+    prompt_user "¿Desea crear una nueva clave SSH ahora? (s/n): "
+  
+    if [[ ! $REPLY =~ ^[Ss]$ ]]; then
+      msg "info" "Creación de clave SSH omitida."
+      return 0
+    fi
+  
+    # Usar una variable de git si está disponible, o un fallback
+    local user_identifier="${GIT_AUTHOR_NAME:-$USER@$HOSTNAME}"
+    local keygen_cmd="ssh-keygen -t ed25519 -b 4096 -C \"$user_identifier\""
+  
+    msg "info" "Se ejecutará el siguiente comando de forma interactiva:"
+    echo -e "${COLOR_YELLOW}${keygen_cmd}${COLOR_RESET}"
+    msg "info" "Se le pedirá que confirme la ruta del archivo y una frase de contraseña (opcional)."
+  
+    # Ejecutar el comando de forma interactiva
+    eval "$keygen_cmd"
+  
+    # Verificar si la clave se creó
+    if [ -f "$ssh_dir/id_ed25519.pub" ]; then
+      msg "success" "Clave SSH 'id_ed25519.pub' creada correctamente en '$ssh_dir'."
+    else
+      msg "error" "La creación de la clave SSH parece haber fallado o se guardó con un nombre diferente."
+    fi
+  }
+  
+  
+  # ---
+  # Flujo Principal
+  # ---
+  
+  function main() {
+    # Manejo de opciones de línea de comandos.
+    # Permite ejecuciones parciales del script.
+    if [ $# -gt 0 ]; then
+      case "$1" in
+        --help)
+          show_help
+          return 0
+          ;;
+        --only-fonts)
+          # Opción exclusiva para instalar solo las fuentes y terminar.
+          install_nerd_fonts
+          return 0
+          ;;
+        --only-nodejs)
+          # Opción exclusiva para instalar NVM y Node.js.
+          install_nvm_and_node
+          return 0
+          ;;
+        --only-dbeaver)
+          # Opción exclusiva para instalar DBeaver.
+          install_dbeaver
+          return 0
+          ;;
+        --only-pyenv)
+          # Opción exclusiva para instalar Pyenv.
+          install_pyenv
+          return 0
+          ;;
+        --only-calibre)
+          # Opción exclusiva para instalar Calibre.
+          install_calibre
+          return 0
+          ;;
+        *)
+          msg "error" "Opción desconocida: $1"
+          show_help
+          exit 1
+          ;;
+      esac
+    fi
+  
+    # Flujo de instalación normal
+    mkdir -p "$LOG_DIR"
+    msg "info" "Iniciando la instalación de los dotfiles..."
+  
+    install_packages
+  
+    if ! command_exists "fzf"; then
+      msg "warn" "'fzf' no está instalado. La integración con el shell se omitirá."
+    fi
+  
+    verify_zsh_plugins
+    install_oh_my_zsh
+    link_dotfiles
+  
+    if command_exists "tmux"; then
+      install_tpm_plugins
+    else
+      msg "warn" "'tmux' no está instalado. Saltando la configuración de TPM y plugins."
+    fi
+  
+    if [ -f "$SCRIPTS_DIR/aditionals-postinstall.sh" ]; then
+      prompt_user "¿Desea ejecutar los pasos adicionales de post-instalación? (s/n): "
+      if [[ $REPLY =~ ^[Ss]$ ]]; then
+        bash "$SCRIPTS_DIR/aditionals-postinstall.sh"
+      fi
+    fi
+  
+    # Paso final de validación: Clave SSH
+    check_and_create_ssh_key
+  
+    msg "success" "¡Instalación de dotfiles completada!"
+    msg "info" "Por favor, reinicie su shell o ejecute 'source ~/.bashrc' o 'source ~/.zshrc' para aplicar los cambios."
+  }
 main "$@"

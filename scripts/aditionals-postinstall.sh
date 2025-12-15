@@ -13,14 +13,26 @@
 # --- 
 
 # Rutas del proyecto (autocontenido)
-readonly PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/.."
+# Detección de ruta robusta para bash y zsh, tanto si se ejecuta como si se obtiene (source).
+if [ -n "$ZSH_VERSION" ]; then
+    # En Zsh, ${(%):-%x} es el path del script. :h extrae el directorio.
+    SCRIPT_DIR=${${(%):-%x}:h}
+    PROJECT_DIR=$(cd "$SCRIPT_DIR/.." &>/dev/null && pwd)
+elif [ -n "$BASH_VERSION" ]; then
+    # En Bash, BASH_SOURCE[0] es el path.
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+    PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+else
+    # Fallback para otros shells. Asume que el script se ejecuta desde el directorio de scripts.
+    PROJECT_DIR=$(pwd)/..
+fi
 
 # Colores para la salida
-readonly COLOR_RESET='\033[0m'
-readonly COLOR_RED='\033[0;31m'
-readonly COLOR_GREEN='\033[0;32m'
-readonly COLOR_YELLOW='\033[0;33m'
-readonly COLOR_CYAN='\033[0;36m'
+COLOR_RESET='\033[0m'
+COLOR_RED='\033[0;31m'
+COLOR_GREEN='\033[0;32m'
+COLOR_YELLOW='\033[0;33m'
+COLOR_CYAN='\033[0;36m'
 
 # Muestra un mensaje con un formato estándar.
 function msg() {
