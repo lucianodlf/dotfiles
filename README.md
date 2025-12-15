@@ -83,3 +83,13 @@ Ideas e insipiraciónes:
 - https://github.com/margrevm/pop-os-post-install/tree/v22.04
 - https://github.com/webpro/awesome-dotfiles
 - https://dotfiles.github.io/inspiration/
+
+
+## Info adicional (no integrados)
+- Para GNOME (Lenovo Battery Threshold): https://extensions.gnome.org/extension/4798/thinkpad-battery-threshold/
+
+
+
+## Info adicional (no integrados)
+- Para GNOME (Lenovo Battery Threshold): https://extensions.gnome.org/extension/4798/thinkpad-battery-threshold/
+
