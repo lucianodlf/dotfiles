@@ -98,3 +98,11 @@ Ideas e insipiraciónes:
 - sudo apt update && sudo apt install fprintd libpam-fprintd
 - sudo pam-auth-update
 
+### Pyenv build
+- Instalar dependencias para build
+```bash
+sudo apt update; sudo apt install make build-essential libssl-dev zlib1g-dev \
+libbz2-dev libreadline-dev libsqlite3-dev curl git \
+libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+``
+- Ref https://github.com/pyenv/pyenv/wiki#suggested-build-environment
