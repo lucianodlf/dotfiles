@@ -92,3 +92,5 @@ if [ -f "$CONFIG_DIR/.shell_config" ]; then
 fi
 
 export DISABLE_AUTO_TITLE='true'
+
+bindkey '^ ' autosuggest-accept

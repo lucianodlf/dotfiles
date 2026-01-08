@@ -47,6 +47,11 @@
   "jobs_search_history": [],
   "lrf_viewer_search_history": [],
   "main_search_history": [
+    "linux",
+    "arbol",
+    "tribi",
+    "bosq",
+    "ursula",
     "comptia",
     "astrologia",
     "jupiter",
@@ -66,12 +71,7 @@
     "Liz Green",
     "hongos",
     "humana",
-    "relaciones",
-    "humanidad",
-    "Zodiaco",
-    "hongo",
-    "El Kyba",
-    "Kibalion"
+    "relaciones"
   ],
   "main_window_geometry": null,
   "match_tags_type": "any",

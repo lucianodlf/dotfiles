@@ -139,11 +139,11 @@
       "height": 1168,
       "width": 1920,
       "x": 0,
-      "y": 32
+      "y": 0
     },
     "qt": {
       "__class__": "bytearray",
-      "__value__": "AdnQywADAAAAAAAAAAAAIAAAB38AAASvAAAAAAAAACAAAAd/AAAErwAAAAACAAAAB4AAAAAAAAAAIAAAB38AAASv"
+      "__value__": "AdnQywADAAAAAAAAAAAAAAAACf8AAAQWAAAAAAAAAAAAAAn/AAAD8gAAAAACAAAACgAAAAAAAAAAJAAACf8AAAQW"
     },
     "screen": {
       "depth": 24,
@@ -155,17 +155,17 @@
         "y": 0
       },
       "index_in_screens_list": 0,
-      "manufacturer": "Lenovo Group Limited",
-      "model": "",
-      "name": "eDP",
-      "serial": "",
+      "manufacturer": "LG Electronics",
+      "model": "LG ULTRAWIDE",
+      "name": "HDMI-1-0",
+      "serial": "267457",
       "size_in_logical_pixels": {
         "height": 1200,
         "width": 1920
       },
       "virtual_geometry": {
-        "height": 1200,
-        "width": 1920,
+        "height": 1080,
+        "width": 2560,
         "x": 0,
         "y": 0
       }
@@ -431,25 +431,25 @@
       "height": 638,
       "width": 854,
       "x": 851,
-      "y": 185
+      "y": 168
     },
     "full_screened": false,
     "geometry": {
       "height": 600,
       "width": 850,
       "x": 853,
-      "y": 221
+      "y": 204
     },
     "maximized": false,
     "normal_geometry": {
       "height": 600,
       "width": 850,
       "x": 853,
-      "y": 221
+      "y": 204
     },
     "qt": {
       "__class__": "bytearray",
-      "__value__": "AdnQywADAAAAAANTAAAAuQAABqgAAAM2AAADVQAAAN0AAAamAAADNAAAAAEAAAAACgAAAANVAAAA3QAABqYAAAM0"
+      "__value__": "AdnQywADAAAAAANTAAAAqAAABqgAAAMlAAADVQAAAMwAAAamAAADIwAAAAAAAAAACgAAAANVAAAAzAAABqYAAAMj"
     },
     "screen": {
       "depth": 24,
@@ -460,7 +460,7 @@
         "x": 0,
         "y": 0
       },
-      "index_in_screens_list": 1,
+      "index_in_screens_list": 0,
       "manufacturer": "LG Electronics",
       "model": "LG ULTRAWIDE",
       "name": "HDMI-1-0",
@@ -471,7 +471,7 @@
       },
       "virtual_geometry": {
         "height": 1080,
-        "width": 4480,
+        "width": 2560,
         "x": 0,
         "y": 0
       }
@@ -500,7 +500,7 @@
     },
     "qt": {
       "__class__": "bytearray",
-      "__value__": "AdnQywADAAAAAAAfAAAAAAAACdwAAAQWAAAAIQAAACQAAAnaAAAEFAAAAAEAAAAACgAAAAAhAAAAJAAACdoAAAQU"
+      "__value__": "AdnQywADAAAAAAAfAAAAAAAACdwAAAQWAAAAIQAAACQAAAnaAAAEFAAAAAAAAAAACgAAAAAhAAAAJAAACdoAAAQU"
     },
     "screen": {
       "depth": 24,
@@ -511,7 +511,7 @@
         "x": 0,
         "y": 0
       },
-      "index_in_screens_list": 1,
+      "index_in_screens_list": 0,
       "manufacturer": "LG Electronics",
       "model": "LG ULTRAWIDE",
       "name": "HDMI-1-0",
@@ -522,7 +522,7 @@
       },
       "virtual_geometry": {
         "height": 1080,
-        "width": 4480,
+        "width": 2560,
         "x": 0,
         "y": 0
       }

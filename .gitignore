@@ -31,3 +31,6 @@ logs/
 
 .bash_history
 
+calibre/calibre/gui.json
+calibre/calibre/dynamic.pickle.json
+
