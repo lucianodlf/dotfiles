@@ -33,4 +33,5 @@ logs/
 
 calibre/calibre/gui.json
 calibre/calibre/dynamic.pickle.json
+calibre/calibre/fonts/scanner_cache.json
 
